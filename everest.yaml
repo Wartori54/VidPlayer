@@ -1,0 +1,9 @@
+- Name: VidPlayer
+  Version: 0.1.0
+  DLL: bin/VidPlayer.dll
+  Dependencies:
+    - Name: EverestCore
+      Version: 1.5421.0
+  OptionalDependencies:
+    - Name: SpeedrunTool
+      Version: 3.24.3

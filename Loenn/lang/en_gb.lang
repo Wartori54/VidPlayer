@@ -1,0 +1,9 @@
+mods.VidPlayer.name=VidPlayer
+
+entities.VidPlayer/VidPlayerEntity.placements.name.vidPlayerEntity=In-Game Video Player
+entities.VidPlayer/VidPlayerEntity.attributes.description.video=The OGV video source to play, formated as "ModName:/absolute/path/to/file.ogv".
+entities.VidPlayer/VidPlayerEntity.attributes.description.muted=Whether the video's audio plays or not.
+entities.VidPlayer/VidPlayerEntity.attributes.description.keepAspectRatio=If true the video won't stretch to fit the given target dimensions.
+entities.VidPlayer/VidPlayerEntity.attributes.description.looping=If true the video will start over after ending.
+entities.VidPlayer/VidPlayerEntity.attributes.description.hires=When false the video will be downscaled to pixel-art form.
+entities.VidPlayer/VidPlayerEntity.attributes.description.volumeMult=Multiplier of the volume.
