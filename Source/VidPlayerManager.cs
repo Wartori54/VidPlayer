@@ -6,20 +6,21 @@ using Monocle;
 
 namespace Celeste.Mod.VidPlayer;
 
-public class VidPlayerManager {
-    public static VidPlayerManager Instance { get; } = new();
-
-    private static readonly Dictionary<string, WeakReference<VidPlayerEntry>> players = new();
+public static class VidPlayerManager {
+    private static readonly Dictionary<ModAsset, WeakReference<VidPlayerEntry>> players = new();
 
     public static VidPlayerEntry GetPlayerFor(string id) {
-        if (players.TryGetValue(id, out WeakReference<VidPlayerEntry>? weakRef) && weakRef.TryGetTarget(out VidPlayerEntry? entry)) return entry;
-        entry = VidPlayerEntry.Create(id);
+        if (!Everest.Content.TryGet(id, out ModAsset videoTargetAsset)) {
+            throw new FileNotFoundException("Could not find video target: " + id);
+        }
+        if (players.TryGetValue(videoTargetAsset, out WeakReference<VidPlayerEntry>? weakRef) && weakRef.TryGetTarget(out VidPlayerEntry? entry)) return entry;
+        entry = VidPlayerEntry.Create(videoTargetAsset);
         if (weakRef != null) {
             weakRef.SetTarget(entry);
         } else {
             weakRef = new WeakReference<VidPlayerEntry>(entry);
         }
-        players[id] = weakRef;
+        players[videoTargetAsset] = weakRef;
         return entry;
     }
 
@@ -32,11 +33,7 @@ public class VidPlayerManager {
             videoPlayer = vidPlayer;
         }
         
-        public static VidPlayerEntry Create(string name) {
-            if (!Everest.Content.TryGet(name, out ModAsset videoTargetAsset)) {
-                throw new FileNotFoundException("Could not find video target: " + name);
-            }
-            
+        public static VidPlayerEntry Create(ModAsset videoTargetAsset) {
             string cachePath = videoTargetAsset.GetCachedPath();
             Video video = Engine.Instance.Content.Load<Video>(cachePath);
             VideoPlayer videoPlayer = new();
