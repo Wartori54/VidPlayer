@@ -109,10 +109,6 @@ public class VidPlayerEntity : Entity {
 
     public override void Update() {
         base.Update();
-        if (Input.GrabCheck) {
-            RemoveSelf();
-            return;
-        }
         
         if (videoPlayer == null) return;
         float normVolume = Settings.Instance.MusicVolume / 10f /* Max volume */ * volumeMult;
