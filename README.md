@@ -1,2 +1,39 @@
 # VidPlayer
-Replace with your mod's readme!
+A simple Celeste mod to play videos in game.
+
+## Usage
+### Requirements
+It currently only supports videos in the OGV format. Consequently you will have to 
+transcode your videos to this format, with ffmpeg you simply can do:
+```bash
+ffmpeg -i infile.mp4 outfile.ogv
+ffmpeg -i input-file.mp4 -codec:v libtheora -qscale:v 7 -codec:a libvorbis -qscale:a 5 output-file.ogv
+```
+to transcode an MP4 video to a OGV one.
+
+Other tools may be able to achieve the same result.
+
+### With Lönn
+Simply pass your video file to the "In-Game Video Player" entity.
+![In loenn](./Docs/in_loenn.png)
+
+### With LuaCutscenes
+It is also possible to play videos programatically through LuaCutscenes:
+```lua
+local vidPlayer = require("#Celeste.Mod.VidPlayerEntity")
+local v
+function onBegin()
+    v = vidPlayer.SpawnLoop("TestMod:/Graphics/Videos/myvideo.ogv", 10, 10, 100, 100)
+    wait(10)
+    v:RemoveSelf()
+end
+
+function onEnd()
+    v:RemoveSelf()
+end
+```
+See [here](Docs/api/Celeste.Mod.VidPlayer.VidPlayerEntity.Lua.md)
+for the full documentation.
+
+## Extra
+Playing the same video file in two players is supported as long as the settings are identical.

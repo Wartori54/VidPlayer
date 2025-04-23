@@ -99,7 +99,7 @@ public class VidPlayerEntity : Entity {
 
     public override void Awake(Scene scene) {
         base.Awake(scene);
-        if (vidEntry == null) return; 
+        if (vidEntry == null) return;
         videoPlayer!.IsLooped = looping;
         videoPlayer.IsMuted = muted;
         videoPlayer.Play(vidEntry.video);
@@ -132,7 +132,7 @@ public class VidPlayerEntity : Entity {
         int scalingFactor = hires ? 6 : 1;
         Vector2 camPos = hires ? SceneAs<Level>().Camera.Position : Vector2.Zero;
         if (vidEntry == null) {
-            fallback.Draw((Position-camPos)*scalingFactor, Vector2.Zero, Color.White, MathF.Min(size.X/fallback.Width, size.Y/fallback.Height)*scalingFactor);
+            fallback.Draw((Position - camPos) * scalingFactor, Vector2.Zero, Color.White, MathF.Min(size.X / fallback.Width, size.Y / fallback.Height) * scalingFactor);
             return;
         }
         Texture2D currTexture = videoPlayer!.GetTexture();
@@ -215,134 +215,145 @@ public class VidPlayerEntity : Entity {
 
     
     // Exposed to Lua
-    /// <summary>
-    /// Spawns a looping video entity, playing the given video file.
-    /// </summary>
-    /// <param name="videoTarget">The video file path.</param>
-    /// <param name="x">X position relative to the room we are currently in.</param>
-    /// <param name="y">Y position relative to the room we are currently in.</param>
-    /// <param name="width">Width of the video, in in-game pixels.</param>
-    /// <param name="height">Height of the video, in in-game pixels.</param>
-    /// <param name="muted">Whether audio plays.</param>
-    /// <param name="hires">Whether the video will be downscaled to celeste's gameplay resolution.</param>
-    /// <returns>A handle you can use in Lua. See LuaHandle down below.</returns>
-    public static LuaHandle SpawnLoop(string videoTarget, int x, int y, int width, int height, bool muted = false, bool hires = true) {
-        if (Engine.Scene is not Level level) {
-            Logger.Error(nameof(VidPlayer), "Tried to spawn video player on non-level scene!");
-            return null!;
-        }
-        VidPlayerEntity vidPlayerEntity = new(new Vector2(x, y), new Vector2(width, height), videoTarget, muted, true, true, hires, 1f, level.LevelOffset);
-        level.Add(vidPlayerEntity);
-        return new LuaHandle(vidPlayerEntity);
-    }
-
-    /// <summary>
-    /// Spawns a video entity that will play a video until it ends, removing itself afterwards.
-    /// </summary>
-    /// <param name="videoTarget">The video file path.</param>
-    /// <param name="x">X position relative to the room we are currently in.</param>
-    /// <param name="y">Y position relative to the room we are currently in.</param>
-    /// <param name="width">Width of the video, in in-game pixels.</param>
-    /// <param name="height">Height of the video, in in-game pixels.</param>
-    /// <param name="muted">Whether audio plays.</param>
-    /// <param name="hires">Whether the video will be downscaled to celeste's gameplay resolution.</param>
-    /// <returns>An IEnumerator you can `coroutine.yield` in lua to execute it.</returns>
-    public static IEnumerator SpawnOneShot(string videoTarget, int x, int y, int width, int height, bool muted = false, bool hires = true) {
-        if (Engine.Scene is not Level level) {
-            Logger.Error(nameof(VidPlayer), "Tried to spawn video player on non-level scene!");
-            yield break;
-        }
-        
-        LuaHandle handle = SpawnFullParameterized(videoTarget, x, y, width, height, muted, hires, true, false, 1f);
-
-        do {
-            yield return null;
-        } while (!handle.Done); // Wait at least a frame
-        // Otherwise the RemoveSelf may fail
-
-        handle.RemoveSelf();
-    }
-
-    /// <summary>
-    /// Spawns a video entity with all the parameters available.
-    /// </summary>
-    /// <param name="videoTarget">The video file path.</param>
-    /// <param name="x">X position relative to the room we are currently in.</param>
-    /// <param name="y">Y position relative to the room we are currently in.</param>
-    /// <param name="width">Width of the video, in in-game pixels.</param>
-    /// <param name="height">Height of the video, in in-game pixels.</param>
-    /// <param name="muted">Whether audio plays.</param>
-    /// <param name="hires">Whether the video will be downscaled to celeste's gameplay resolution.</param>
-    /// <param name="keepAspectRatio">Whether to stretch the video to fit the given width/height or to keep the ratio width/height ratio from the video file.</param>
-    /// <param name="looping">Whether playback loops forever or stops after the video is over.</param>
-    /// <param name="volumeMult">Real value to multiply the volume with, ranging from 0 to 1.</param>
-    /// <returns>A handle you can use in Lua. See LuaHandle down below.</returns>
-    public static LuaHandle SpawnFullParameterized(
-        string videoTarget, 
-        int x, 
-        int y, 
-        int width, 
-        int height, 
-        bool muted,
-        bool hires,
-        bool keepAspectRatio,
-        bool looping,
-        float volumeMult) {
-        if (Engine.Scene is not Level level) {
-            Logger.Error(nameof(VidPlayer), "Tried to spawn video player on non-level scene!");
-            return null!;
-        }
-        VidPlayerEntity vidPlayerEntity = new(new Vector2(x, y), new Vector2(width, height), videoTarget, muted, keepAspectRatio, looping, hires, volumeMult, level.LevelOffset);
-        level.Add(vidPlayerEntity);
-        
-        return new LuaHandle(vidPlayerEntity);
-    }
-
-    // It is extremely easy to leak references to c# objects in lua by accidentally not declaring something as local,
-    // thus to prevent such mistakes we need a wrapper, the vid player entity will be alive as long as it is in the scene
-    // thus this should be reliable
-    
-    /// <summary>
-    /// A handle usable in lua to manipulate VidPlayerEntities
-    /// Call `RemoveSelf` on this to remove the entity, this handle won't be functional after the call.
-    /// </summary>
-    public class LuaHandle {
-        private readonly WeakReference<VidPlayerEntity> _ref;
-        private bool disposed;
-
-        public bool Visible {
-            get => getRef()?.Visible ?? true;
-            set {
-                VidPlayerEntity? @ref = getRef();
-                if (@ref != null) @ref.Visible = value;
+    public static class Lua {
+        /// <summary>
+        /// Spawns a looping video entity, playing the given video file.
+        /// </summary>
+        /// <param name="videoTarget">The video file path.</param>
+        /// <param name="x">X position relative to the room we are currently in.</param>
+        /// <param name="y">Y position relative to the room we are currently in.</param>
+        /// <param name="width">Width of the video, in in-game pixels.</param>
+        /// <param name="height">Height of the video, in in-game pixels.</param>
+        /// <param name="muted">Whether audio plays.</param>
+        /// <param name="hires">Whether the video will be downscaled to celeste's gameplay resolution.</param>
+        /// <returns>A handle you can use in Lua. See LuaHandle down below.</returns>
+        public static LuaHandle SpawnLoop(string videoTarget, int x, int y, int width, int height, bool muted = false, bool hires = true) {
+            if (Engine.Scene is not Level level) {
+                Logger.Error(nameof(VidPlayer), "Tried to spawn video player on non-level scene!");
+                return null!;
             }
+            VidPlayerEntity vidPlayerEntity = new(new Vector2(x, y), new Vector2(width, height), videoTarget, muted, true, true, hires, 1f, level.LevelOffset);
+            level.Add(vidPlayerEntity);
+            return new LuaHandle(vidPlayerEntity);
         }
 
-        public bool Muted {
-            get => getRef()?.Muted ?? false;
-            set {
-                VidPlayerEntity? @ref = getRef();
-                if (@ref != null) @ref.Muted = value;
+        /// <summary>
+        /// Spawns a video entity that will play a video until it ends, removing itself afterwards.
+        /// </summary>
+        /// <param name="videoTarget">The video file path.</param>
+        /// <param name="x">X position relative to the room we are currently in.</param>
+        /// <param name="y">Y position relative to the room we are currently in.</param>
+        /// <param name="width">Width of the video, in in-game pixels.</param>
+        /// <param name="height">Height of the video, in in-game pixels.</param>
+        /// <param name="muted">Whether audio plays.</param>
+        /// <param name="hires">Whether the video will be downscaled to celeste's gameplay resolution.</param>
+        /// <returns>An IEnumerator you can `coroutine.yield` in lua to execute it.</returns>
+        public static IEnumerator SpawnOneShot(string videoTarget, int x, int y, int width, int height, bool muted = false, bool hires = true) {
+            if (Engine.Scene is not Level level) {
+                Logger.Error(nameof(VidPlayer), "Tried to spawn video player on non-level scene!");
+                yield break;
             }
+
+            LuaHandle handle = SpawnFullParameterized(videoTarget, x, y, width, height, muted, hires, true, false, 1f);
+
+            do {
+                yield return null;
+            } while (!handle.Done); // Wait at least a frame
+            // Otherwise the RemoveSelf may fail
+
+            handle.RemoveSelf();
         }
 
-        public bool Done => getRef()?.Done ?? true;
-        
-        public LuaHandle(VidPlayerEntity vidPlayerEntity) {
-            _ref = new WeakReference<VidPlayerEntity>(vidPlayerEntity);
-        }
-
-        public void RemoveSelf() {
-            getRef()?.RemoveSelf();
-            disposed = true;
-        }
-
-        private VidPlayerEntity? getRef() {
-            if (disposed) return null;
-            if (!_ref.TryGetTarget(out VidPlayerEntity? vidPlayerEntity)) {
-                Logger.Error(nameof(VidPlayerModule), "VidPlayerEntity died prematurely!");
+        /// <summary>
+        /// Spawns a video entity with all the parameters available.
+        /// </summary>
+        /// <param name="videoTarget">The video file path.</param>
+        /// <param name="x">X position relative to the room we are currently in.</param>
+        /// <param name="y">Y position relative to the room we are currently in.</param>
+        /// <param name="width">Width of the video, in in-game pixels.</param>
+        /// <param name="height">Height of the video, in in-game pixels.</param>
+        /// <param name="muted">Whether audio plays.</param>
+        /// <param name="hires">Whether the video will be downscaled to celeste's gameplay resolution.</param>
+        /// <param name="keepAspectRatio">Whether to stretch the video to fit the given width/height or to keep the ratio width/height ratio from the video file.</param>
+        /// <param name="looping">Whether playback loops forever or stops after the video is over.</param>
+        /// <param name="volumeMult">Real value to multiply the volume with, ranging from 0 to 1.</param>
+        /// <returns>A handle you can use in Lua. See LuaHandle down below.</returns>
+        public static LuaHandle SpawnFullParameterized(
+            string videoTarget,
+            int x,
+            int y,
+            int width,
+            int height,
+            bool muted,
+            bool hires,
+            bool keepAspectRatio,
+            bool looping,
+            float volumeMult) {
+            if (Engine.Scene is not Level level) {
+                Logger.Error(nameof(VidPlayer), "Tried to spawn video player on non-level scene!");
+                return null!;
             }
-            return vidPlayerEntity;
+            VidPlayerEntity vidPlayerEntity = new(new Vector2(x, y), new Vector2(width, height), videoTarget, muted, keepAspectRatio, looping, hires, volumeMult, level.LevelOffset);
+            level.Add(vidPlayerEntity);
+
+            return new LuaHandle(vidPlayerEntity);
+        }
+
+        // It is extremely easy to leak references to c# objects in lua by accidentally not declaring something as local,
+        // thus to prevent such mistakes we need a wrapper, the vid player entity will be alive as long as it is in the scene
+        // thus this should be reliable
+
+        /// <summary>
+        /// A handle usable in lua to manipulate VidPlayerEntities
+        /// Call `RemoveSelf` on this to remove the entity. This handle won't be functional after the call.
+        /// </summary>
+        public class LuaHandle {
+            private readonly WeakReference<VidPlayerEntity> _ref;
+            private bool disposed;
+            
+            /// <summary>
+            /// Whether the entity is or should be visible.
+            /// </summary>
+            public bool Visible {
+                get => getRef()?.Visible ?? true;
+                set {
+                    VidPlayerEntity? @ref = getRef();
+                    if (@ref != null) @ref.Visible = value;
+                }
+            }
+
+            /// <summary>
+            /// Whether audio is muted or playing.
+            /// </summary>
+            public bool Muted {
+                get => getRef()?.Muted ?? false;
+                set {
+                    VidPlayerEntity? @ref = getRef();
+                    if (@ref != null) @ref.Muted = value;
+                }
+            }
+
+            /// <summary>
+            /// Whether the video has finished, or always false if the video loops.
+            /// </summary>
+            public bool Done => getRef()?.Done ?? true;
+
+            public LuaHandle(VidPlayerEntity vidPlayerEntity) {
+                _ref = new WeakReference<VidPlayerEntity>(vidPlayerEntity);
+            }
+
+            public void RemoveSelf() {
+                getRef()?.RemoveSelf();
+                disposed = true;
+            }
+
+            private VidPlayerEntity? getRef() {
+                if (disposed) return null;
+                if (!_ref.TryGetTarget(out VidPlayerEntity? vidPlayerEntity)) {
+                    Logger.Error(nameof(VidPlayerModule), "VidPlayerEntity died prematurely!");
+                }
+                return vidPlayerEntity;
+            }
         }
     }
 }
