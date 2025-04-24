@@ -6,7 +6,6 @@ A simple Celeste mod to play videos in game.
 It currently only supports videos in the OGV format. Consequently you will have to 
 transcode your videos to this format, with ffmpeg you simply can do:
 ```bash
-ffmpeg -i infile.mp4 outfile.ogv
 ffmpeg -i input-file.mp4 -codec:v libtheora -qscale:v 7 -codec:a libvorbis -qscale:a 5 output-file.ogv
 ```
 to transcode an MP4 video to a OGV one.
