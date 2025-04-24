@@ -25,3 +25,5 @@ Call `RemoveSelf` on this to remove the entity. This handle won't be functional 
 
  [VidPlayerModuleSettings](Celeste.Mod.VidPlayer.VidPlayerModuleSettings.md)
 
+ [VidPlayerStyleground](Celeste.Mod.VidPlayer.VidPlayerStyleground.md)
+

@@ -176,6 +176,18 @@ public VidPlayerEntity(Vector2 position, Vector2 entitySize, string videoTarget,
 
 `offset` Vector2
 
+## Fields
+
+### <a id="Celeste_Mod_VidPlayer_VidPlayerEntity_sceneless"></a> sceneless
+
+```csharp
+public bool sceneless
+```
+
+#### Field Value
+
+ [bool](https://learn.microsoft.com/dotnet/api/system.boolean)
+
 ## Properties
 
 ### <a id="Celeste_Mod_VidPlayer_VidPlayerEntity_Done"></a> Done

@@ -24,7 +24,7 @@ public class VidPlayerEntity : Entity {
     private readonly MTexture fallback;
     private readonly VidPlayerManager.VidPlayerEntry? vidEntry;
     private bool hasWoken = false;
-    
+    public bool sceneless = false;
     
     // For handyness
     private VideoPlayer? videoPlayer => vidEntry?.videoPlayer;
@@ -103,7 +103,6 @@ public class VidPlayerEntity : Entity {
         videoPlayer!.IsLooped = looping;
         videoPlayer.IsMuted = muted;
         videoPlayer.Play(vidEntry.video);
-        base.Awake(scene);
         hasWoken = true;
     }
 
@@ -116,7 +115,7 @@ public class VidPlayerEntity : Entity {
         // ReSharper disable once CompareOfFloatsByEqualityOperator
         if (normVolume != videoPlayer.Volume)
             videoPlayer.Volume = normVolume;
-        if (Scene.Paused || SceneAs<Level>().Transitioning) {
+        if (!sceneless && (Scene.Paused || SceneAs<Level>().Transitioning)) {
             videoPlayer.Pause();
         } else {
             videoPlayer.Resume();
@@ -126,7 +125,7 @@ public class VidPlayerEntity : Entity {
     public override void Render() {
         base.Render();
         int scalingFactor = hires ? 6 : 1;
-        Vector2 camPos = hires ? SceneAs<Level>().Camera.Position : Vector2.Zero;
+        Vector2 camPos = hires && !sceneless ? SceneAs<Level>().Camera.Position : Vector2.Zero;
         if (vidEntry == null) {
             fallback.Draw((Position - camPos) * scalingFactor, Vector2.Zero, Color.White, MathF.Min(size.X / fallback.Width, size.Y / fallback.Height) * scalingFactor);
             return;
@@ -157,12 +156,15 @@ public class VidPlayerEntity : Entity {
     }
     
     private void SaveState() {
-        videoPlayer?.Pause();
+        if (!sceneless)
+            videoPlayer?.Pause();
     }
 
     private void LoadState(Level newLevel) {
-        Scene = newLevel;
-        videoPlayer?.Pause();
+        if (!sceneless) {
+            Scene = newLevel;
+            videoPlayer?.Pause();
+        }
     }
 
 #if DEBUG_GC
@@ -198,14 +200,29 @@ public class VidPlayerEntity : Entity {
     }
 
     private static void Save(Dictionary<Type, Dictionary<string, object>> ctx, Level level) {
-        foreach (Entity vidPlayerEntity in level.Tracker.GetEntities<VidPlayerEntity>()) {
-            ((VidPlayerEntity) vidPlayerEntity).SaveState();
+        foreach (VidPlayerEntity vidPlayerEntity in GetAllEntities(level)) {
+            vidPlayerEntity.SaveState();
         }
     }
     
     private static void Load(Dictionary<Type, Dictionary<string, object>> ctx, Level level) {
+        foreach (VidPlayerEntity vidPlayerEntity in GetAllEntities(level)) {
+            vidPlayerEntity.LoadState(level);
+        }
+    }
+
+    private static IEnumerable<VidPlayerEntity> GetAllEntities(Level level) {
         foreach (Entity vidPlayerEntity in level.Tracker.GetEntities<VidPlayerEntity>()) {
-            ((VidPlayerEntity) vidPlayerEntity).LoadState(level);
+            yield return (VidPlayerEntity) vidPlayerEntity;
+        }
+
+        BackdropRenderer[] backdrops = [level.Background, level.Foreground];
+        foreach (BackdropRenderer renderer in backdrops) {
+            foreach (Backdrop backdrop in renderer.Backdrops) {
+                if (backdrop is VidPlayerStyleground styleground) {
+                    yield return styleground.Entity;
+                }
+            }
         }
     }
 

@@ -51,15 +51,15 @@ public readonly VideoPlayer videoPlayer
 
 ## Methods
 
-### <a id="Celeste_Mod_VidPlayer_VidPlayerManager_VidPlayerEntry_Create_System_String_"></a> Create\(string\)
+### <a id="Celeste_Mod_VidPlayer_VidPlayerManager_VidPlayerEntry_Create_Celeste_Mod_ModAsset_"></a> Create\(ModAsset\)
 
 ```csharp
-public static VidPlayerManager.VidPlayerEntry Create(string name)
+public static VidPlayerManager.VidPlayerEntry Create(ModAsset videoTargetAsset)
 ```
 
 #### Parameters
 
-`name` [string](https://learn.microsoft.com/dotnet/api/system.string)
+`videoTargetAsset` ModAsset
 
 #### Returns
 

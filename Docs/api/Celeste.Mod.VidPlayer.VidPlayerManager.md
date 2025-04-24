@@ -4,7 +4,7 @@ Namespace: [Celeste.Mod.VidPlayer](Celeste.Mod.VidPlayer.md)
 Assembly: VidPlayer.dll  
 
 ```csharp
-public class VidPlayerManager
+public static class VidPlayerManager
 ```
 
 #### Inheritance
@@ -21,18 +21,6 @@ public class VidPlayerManager
 [object.MemberwiseClone\(\)](https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone), 
 [object.ReferenceEquals\(object?, object?\)](https://learn.microsoft.com/dotnet/api/system.object.referenceequals), 
 [object.ToString\(\)](https://learn.microsoft.com/dotnet/api/system.object.tostring)
-
-## Properties
-
-### <a id="Celeste_Mod_VidPlayer_VidPlayerManager_Instance"></a> Instance
-
-```csharp
-public static VidPlayerManager Instance { get; }
-```
-
-#### Property Value
-
- [VidPlayerManager](Celeste.Mod.VidPlayer.VidPlayerManager.md)
 
 ## Methods
 

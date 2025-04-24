@@ -13,7 +13,7 @@ public static class VidPlayerManager {
         if (!Everest.Content.TryGet(id, out ModAsset videoTargetAsset)) {
             throw new FileNotFoundException("Could not find video target: " + id);
         }
-        if (players.TryGetValue(videoTargetAsset, out WeakReference<VidPlayerEntry>? weakRef) && weakRef.TryGetTarget(out VidPlayerEntry? entry)) return entry;
+        if (players.TryGetValue(videoTargetAsset, out WeakReference<VidPlayerEntry>? weakRef) && weakRef.TryGetTarget(out VidPlayerEntry? entry) && !entry.videoPlayer.IsDisposed) return entry;
         entry = VidPlayerEntry.Create(videoTargetAsset);
         if (weakRef != null) {
             weakRef.SetTarget(entry);
