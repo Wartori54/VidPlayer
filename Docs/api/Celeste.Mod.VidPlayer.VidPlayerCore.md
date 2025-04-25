@@ -134,6 +134,12 @@ public static void RegisterSRTInterop()
 public void Render()
 ```
 
+### <a id="Celeste_Mod_VidPlayer_VidPlayerCore_Reset"></a> Reset\(\)
+
+```csharp
+public void Reset()
+```
+
 ### <a id="Celeste_Mod_VidPlayer_VidPlayerCore_SaveState_Celeste_Level_"></a> SaveState\(Level\)
 
 ```csharp

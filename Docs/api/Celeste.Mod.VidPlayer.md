@@ -6,6 +6,7 @@
 
 A handle usable in lua to manipulate VidPlayerEntities
 Call `RemoveSelf` on this to remove the entity. This handle won't be functional after the call.
+You can also control the player with the properties and methods below.
 
  [SRTModImports](Celeste.Mod.VidPlayer.SRTModImports.md)
 
@@ -28,4 +29,6 @@ Call `RemoveSelf` on this to remove the entity. This handle won't be functional 
  [VidPlayerModuleSettings](Celeste.Mod.VidPlayer.VidPlayerModuleSettings.md)
 
  [VidPlayerStyleground](Celeste.Mod.VidPlayer.VidPlayerStyleground.md)
+
+ [VidPlayerStylegroundReset](Celeste.Mod.VidPlayer.VidPlayerStylegroundReset.md)
 

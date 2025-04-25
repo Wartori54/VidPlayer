@@ -19,6 +19,8 @@ public sealed class VidPlayerEntity : Entity {
     public VidPlayerCore Core => core;
 
     public bool Done => core.Done;
+
+    public bool ForcePause;
     public bool Muted {
         get => core.Muted;
         set => core.Muted = value;
@@ -90,7 +92,7 @@ public sealed class VidPlayerEntity : Entity {
             this.owner = owner;
         }
 
-        protected override bool Paused => owner.Scene.Paused || owner.SceneAs<Level>().Transitioning;
+        protected override bool Paused => owner.Scene.Paused || owner.SceneAs<Level>().Transitioning || owner.ForcePause;
         protected override Vector2 Position => hires ? owner.Position - owner.SceneAs<Level>().Camera.Position : owner.Position;
 
         protected override void LoadState(Level newLevel) {
@@ -113,7 +115,7 @@ public class VidPlayerEntityLua {
     /// <param name="height">Height of the video, in in-game pixels.</param>
     /// <param name="muted">Whether audio plays.</param>
     /// <param name="hires">Whether the video will be downscaled to celeste's gameplay resolution.</param>
-    /// <returns>A handle you can use in Lua. See LuaHandle down below.</returns>
+    /// <returns>A handle you can use in Lua. See LuaHandle for more info.</returns>
     public static LuaHandle SpawnLoop(string videoTarget, int x, int y, int width, int height, bool muted = false, bool hires = true) {
         if (Engine.Scene is not Level level) {
             Logger.Error(nameof(VidPlayer), "Tried to spawn video player on non-level scene!");
@@ -164,7 +166,7 @@ public class VidPlayerEntityLua {
     /// <param name="keepAspectRatio">Whether to stretch the video to fit the given width/height or to keep the ratio width/height ratio from the video file.</param>
     /// <param name="looping">Whether playback loops forever or stops after the video is over.</param>
     /// <param name="volumeMult">Real value to multiply the volume with, ranging from 0 to 1.</param>
-    /// <returns>A handle you can use in Lua. See LuaHandle down below.</returns>
+    /// <returns>A handle you can use in Lua. See LuaHandle for more info.</returns>
     public static LuaHandle SpawnFullParameterized(
         string videoTarget,
         int x,
@@ -193,13 +195,14 @@ public class VidPlayerEntityLua {
     /// <summary>
     /// A handle usable in lua to manipulate VidPlayerEntities
     /// Call `RemoveSelf` on this to remove the entity. This handle won't be functional after the call.
+    /// You can also control the player with the properties and methods below.
     /// </summary>
     public class LuaHandle {
         private readonly WeakReference<VidPlayerEntity> _ref;
         private bool disposed;
         
         /// <summary>
-        /// Whether the entity is or should be visible.
+        /// Whether the entity is or should be visible. Does not stop audio from playing. Use Pause for that.
         /// </summary>
         public bool Visible {
             get => getRef()?.Visible ?? true;
@@ -217,6 +220,17 @@ public class VidPlayerEntityLua {
             set {
                 VidPlayerEntity? @ref = getRef();
                 if (@ref != null) @ref.Muted = value;
+            }
+        }
+
+        /// <summary>
+        /// Pauses or resumes the video player.
+        /// </summary>
+        public bool Paused {
+            get => getRef()?.ForcePause ?? false;
+            set {
+                VidPlayerEntity? @ref = getRef();
+                if (@ref != null) @ref.ForcePause = value;
             }
         }
 
@@ -240,6 +254,15 @@ public class VidPlayerEntityLua {
                 Logger.Error(nameof(VidPlayerModule), "VidPlayerEntity died prematurely!");
             }
             return vidPlayerEntity;
+        }
+
+        /// <summary>
+        /// Resets the video player to the start of the video.
+        /// </summary>
+        public void Reset() {
+            VidPlayerEntity? @ref = getRef();
+            if (@ref == null) return;
+            @ref.Core?.Reset();
         }
     }
 }

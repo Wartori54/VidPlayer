@@ -5,6 +5,7 @@ Assembly: VidPlayer.dll
 
 A handle usable in lua to manipulate VidPlayerEntities
 Call `RemoveSelf` on this to remove the entity. This handle won't be functional after the call.
+You can also control the player with the properties and methods below.
 
 ```csharp
 public class VidPlayerEntityLua.LuaHandle
@@ -63,9 +64,21 @@ public bool Muted { get; set; }
 
  [bool](https://learn.microsoft.com/dotnet/api/system.boolean)
 
+### <a id="Celeste_Mod_VidPlayer_VidPlayerEntityLua_LuaHandle_Paused"></a> Paused
+
+Pauses or resumes the video player.
+
+```csharp
+public bool Paused { get; set; }
+```
+
+#### Property Value
+
+ [bool](https://learn.microsoft.com/dotnet/api/system.boolean)
+
 ### <a id="Celeste_Mod_VidPlayer_VidPlayerEntityLua_LuaHandle_Visible"></a> Visible
 
-Whether the entity is or should be visible.
+Whether the entity is or should be visible. Does not stop audio from playing. Use Pause for that.
 
 ```csharp
 public bool Visible { get; set; }
@@ -81,5 +94,13 @@ public bool Visible { get; set; }
 
 ```csharp
 public void RemoveSelf()
+```
+
+### <a id="Celeste_Mod_VidPlayer_VidPlayerEntityLua_LuaHandle_Reset"></a> Reset\(\)
+
+Resets the video player to the start of the video.
+
+```csharp
+public void Reset()
 ```
 

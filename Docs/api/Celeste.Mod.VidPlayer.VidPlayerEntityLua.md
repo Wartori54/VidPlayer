@@ -78,7 +78,7 @@ Real value to multiply the volume with, ranging from 0 to 1.
 
  [VidPlayerEntityLua](Celeste.Mod.VidPlayer.VidPlayerEntityLua.md).[LuaHandle](Celeste.Mod.VidPlayer.VidPlayerEntityLua.LuaHandle.md)
 
-A handle you can use in Lua. See LuaHandle down below.
+A handle you can use in Lua. See LuaHandle for more info.
 
 ### <a id="Celeste_Mod_VidPlayer_VidPlayerEntityLua_SpawnLoop_System_String_System_Int32_System_Int32_System_Int32_System_Int32_System_Boolean_System_Boolean_"></a> SpawnLoop\(string, int, int, int, int, bool, bool\)
 
@@ -122,7 +122,7 @@ Whether the video will be downscaled to celeste's gameplay resolution.
 
  [VidPlayerEntityLua](Celeste.Mod.VidPlayer.VidPlayerEntityLua.md).[LuaHandle](Celeste.Mod.VidPlayer.VidPlayerEntityLua.LuaHandle.md)
 
-A handle you can use in Lua. See LuaHandle down below.
+A handle you can use in Lua. See LuaHandle for more info.
 
 ### <a id="Celeste_Mod_VidPlayer_VidPlayerEntityLua_SpawnOneShot_System_String_System_Int32_System_Int32_System_Int32_System_Int32_System_Boolean_System_Boolean_"></a> SpawnOneShot\(string, int, int, int, int, bool, bool\)
 

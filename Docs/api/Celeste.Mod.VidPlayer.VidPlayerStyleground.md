@@ -71,12 +71,12 @@ public VidPlayerStyleground(BinaryPacker.Element data)
 ### <a id="Celeste_Mod_VidPlayer_VidPlayerStyleground_Core"></a> Core
 
 ```csharp
-public VidPlayerCore Core { get; }
+public VidPlayerCore? Core { get; }
 ```
 
 #### Property Value
 
- [VidPlayerCore](Celeste.Mod.VidPlayer.VidPlayerCore.md)
+ [VidPlayerCore](Celeste.Mod.VidPlayer.VidPlayerCore.md)?
 
 ## Methods
 
