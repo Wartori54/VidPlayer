@@ -97,7 +97,7 @@ public abstract class VidPlayerCore {
         if (!keepAspectRatio) {
             dstRect = new Rectangle((int)Position.X * scalingFactor, (int)Position.Y * scalingFactor, (int)size.X * scalingFactor, (int)size.Y * scalingFactor);
         } else {
-            float ratio = vidEntry.video.Width / (float)vidEntry.video.Height;
+            float ratio = vidEntry!.video.Width / (float)vidEntry.video.Height;
             float finalSizeX;
             float finalSizeY;
             if (size.X / size.Y > ratio) {
@@ -196,7 +196,7 @@ public abstract class VidPlayerCore {
         BackdropRenderer[] backdrops = [level.Background, level.Foreground];
         foreach (BackdropRenderer renderer in backdrops) {
             foreach (Backdrop backdrop in renderer.Backdrops) {
-                if (backdrop is VidPlayerStyleground styleground) {
+                if (backdrop is VidPlayerStyleground styleground && styleground.Core != null) {
                     yield return styleground.Core;
                 }
             }
