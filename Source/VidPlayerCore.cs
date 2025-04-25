@@ -67,7 +67,8 @@ public abstract class VidPlayerCore {
         videoPlayer!.IsLooped = looping;
         videoPlayer.IsMuted = muted;
         videoPlayer.Volume = 0; // Audio volume will be determined on first update instead
-        videoPlayer.Play(vidEntry.video);
+        videoPlayer.Play(vidEntry!.video);
+        videoPlayer.Pause();
         hasWoken = true;
     }
 
@@ -124,6 +125,12 @@ public abstract class VidPlayerCore {
     public void Mark() {
         if (checkDisposed()) return;
         vidEntry!.MarkForCollection();
+    }
+
+    public void Reset() {
+        if (checkDisposed()) return;
+        videoPlayer!.Stop();
+        Init();
     }
     
     protected virtual void SaveState(Level newLevel) {
