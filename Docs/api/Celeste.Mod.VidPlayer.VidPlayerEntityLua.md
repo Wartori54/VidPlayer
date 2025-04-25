@@ -1,16 +1,16 @@
-# <a id="Celeste_Mod_VidPlayer_VidPlayerEntity_Lua"></a> Class VidPlayerEntity.Lua
+# <a id="Celeste_Mod_VidPlayer_VidPlayerEntityLua"></a> Class VidPlayerEntityLua
 
 Namespace: [Celeste.Mod.VidPlayer](Celeste.Mod.VidPlayer.md)  
 Assembly: VidPlayer.dll  
 
 ```csharp
-public static class VidPlayerEntity.Lua
+public class VidPlayerEntityLua
 ```
 
 #### Inheritance
 
 [object](https://learn.microsoft.com/dotnet/api/system.object) ← 
-[VidPlayerEntity.Lua](Celeste.Mod.VidPlayer.VidPlayerEntity.Lua.md)
+[VidPlayerEntityLua](Celeste.Mod.VidPlayer.VidPlayerEntityLua.md)
 
 #### Inherited Members
 
@@ -24,12 +24,12 @@ public static class VidPlayerEntity.Lua
 
 ## Methods
 
-### <a id="Celeste_Mod_VidPlayer_VidPlayerEntity_Lua_SpawnFullParameterized_System_String_System_Int32_System_Int32_System_Int32_System_Int32_System_Boolean_System_Boolean_System_Boolean_System_Boolean_System_Single_"></a> SpawnFullParameterized\(string, int, int, int, int, bool, bool, bool, bool, float\)
+### <a id="Celeste_Mod_VidPlayer_VidPlayerEntityLua_SpawnFullParameterized_System_String_System_Int32_System_Int32_System_Int32_System_Int32_System_Boolean_System_Boolean_System_Boolean_System_Boolean_System_Single_"></a> SpawnFullParameterized\(string, int, int, int, int, bool, bool, bool, bool, float\)
 
 Spawns a video entity with all the parameters available.
 
 ```csharp
-public static VidPlayerEntity.Lua.LuaHandle SpawnFullParameterized(string videoTarget, int x, int y, int width, int height, bool muted, bool hires, bool keepAspectRatio, bool looping, float volumeMult)
+public static VidPlayerEntityLua.LuaHandle SpawnFullParameterized(string videoTarget, int x, int y, int width, int height, bool muted, bool hires, bool keepAspectRatio, bool looping, float volumeMult)
 ```
 
 #### Parameters
@@ -76,16 +76,16 @@ Real value to multiply the volume with, ranging from 0 to 1.
 
 #### Returns
 
- [VidPlayerEntity](Celeste.Mod.VidPlayer.VidPlayerEntity.md).[Lua](Celeste.Mod.VidPlayer.VidPlayerEntity.Lua.md).[LuaHandle](Celeste.Mod.VidPlayer.VidPlayerEntity.Lua.LuaHandle.md)
+ [VidPlayerEntityLua](Celeste.Mod.VidPlayer.VidPlayerEntityLua.md).[LuaHandle](Celeste.Mod.VidPlayer.VidPlayerEntityLua.LuaHandle.md)
 
 A handle you can use in Lua. See LuaHandle down below.
 
-### <a id="Celeste_Mod_VidPlayer_VidPlayerEntity_Lua_SpawnLoop_System_String_System_Int32_System_Int32_System_Int32_System_Int32_System_Boolean_System_Boolean_"></a> SpawnLoop\(string, int, int, int, int, bool, bool\)
+### <a id="Celeste_Mod_VidPlayer_VidPlayerEntityLua_SpawnLoop_System_String_System_Int32_System_Int32_System_Int32_System_Int32_System_Boolean_System_Boolean_"></a> SpawnLoop\(string, int, int, int, int, bool, bool\)
 
 Spawns a looping video entity, playing the given video file.
 
 ```csharp
-public static VidPlayerEntity.Lua.LuaHandle SpawnLoop(string videoTarget, int x, int y, int width, int height, bool muted = false, bool hires = true)
+public static VidPlayerEntityLua.LuaHandle SpawnLoop(string videoTarget, int x, int y, int width, int height, bool muted = false, bool hires = true)
 ```
 
 #### Parameters
@@ -120,11 +120,11 @@ Whether the video will be downscaled to celeste's gameplay resolution.
 
 #### Returns
 
- [VidPlayerEntity](Celeste.Mod.VidPlayer.VidPlayerEntity.md).[Lua](Celeste.Mod.VidPlayer.VidPlayerEntity.Lua.md).[LuaHandle](Celeste.Mod.VidPlayer.VidPlayerEntity.Lua.LuaHandle.md)
+ [VidPlayerEntityLua](Celeste.Mod.VidPlayer.VidPlayerEntityLua.md).[LuaHandle](Celeste.Mod.VidPlayer.VidPlayerEntityLua.LuaHandle.md)
 
 A handle you can use in Lua. See LuaHandle down below.
 
-### <a id="Celeste_Mod_VidPlayer_VidPlayerEntity_Lua_SpawnOneShot_System_String_System_Int32_System_Int32_System_Int32_System_Int32_System_Boolean_System_Boolean_"></a> SpawnOneShot\(string, int, int, int, int, bool, bool\)
+### <a id="Celeste_Mod_VidPlayer_VidPlayerEntityLua_SpawnOneShot_System_String_System_Int32_System_Int32_System_Int32_System_Int32_System_Boolean_System_Boolean_"></a> SpawnOneShot\(string, int, int, int, int, bool, bool\)
 
 Spawns a video entity that will play a video until it ends, removing itself afterwards.
 

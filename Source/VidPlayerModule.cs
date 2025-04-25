@@ -33,18 +33,24 @@ public class VidPlayerModule : EverestModule {
     private static MethodBase GC_Collect = typeof(GC).GetMethod(nameof(GC.Collect), []) ?? throw new InvalidOperationException("Cannot find GC.Collect()!");
     public override void Load() {
         typeof(SRTModImports).ModInterop();
-        VidPlayerEntity.RegisterSRTInterop();
+        VidPlayerCore.RegisterSRTInterop();
 
-        On.Monocle.Engine.OnSceneTransition += EngineOnOnSceneTransition;
-        On.Celeste.Level._GCCollect += LevelOn_GCCollect;
-        IL.Celeste.Level.Reload += ILLevelOnReload;
+        // These completely break savestates...
+        // On.Monocle.Engine.OnSceneTransition += EngineOnOnSceneTransition;
+        // On.Celeste.Level._GCCollect += LevelOn_GCCollect;
+        // IL.Celeste.Level.Reload += ILLevelOnReload;
+        On.Celeste.Level.Update += LevelOnUpdate;
     }
-    
+    private static void LevelOnUpdate(On.Celeste.Level.orig_Update orig, Level self) {
+        orig(self);
+        VidPlayerManager.Collect();
+    }
+
     public override void Unload() {
-        VidPlayerEntity.UnregisterSRTInterop();
-        On.Monocle.Engine.OnSceneTransition -= EngineOnOnSceneTransition;
-        On.Celeste.Level._GCCollect -= LevelOn_GCCollect;
-        IL.Celeste.Level.Reload -= ILLevelOnReload;
+        VidPlayerCore.UnregisterSRTInterop();
+        // On.Monocle.Engine.OnSceneTransition -= EngineOnOnSceneTransition;
+        // On.Celeste.Level._GCCollect -= LevelOn_GCCollect;
+        // IL.Celeste.Level.Reload -= ILLevelOnReload;
     }
     
     private static void ILLevelOnReload(ILContext il) {

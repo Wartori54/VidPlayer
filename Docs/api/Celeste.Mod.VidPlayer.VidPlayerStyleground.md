@@ -5,7 +5,7 @@ Assembly: VidPlayer.dll
 
 ```csharp
 [CustomBackdrop(new string[] { "VidPlayer/VidPlayerStyleground" })]
-public class VidPlayerStyleground : Backdrop
+public sealed class VidPlayerStyleground : Backdrop
 ```
 
 #### Inheritance
@@ -51,7 +51,6 @@ Backdrop.Ended\(Scene\),
 [object.Equals\(object?, object?\)](https://learn.microsoft.com/dotnet/api/system.object.equals\#system\-object\-equals\(system\-object\-system\-object\)), 
 [object.GetHashCode\(\)](https://learn.microsoft.com/dotnet/api/system.object.gethashcode), 
 [object.GetType\(\)](https://learn.microsoft.com/dotnet/api/system.object.gettype), 
-[object.MemberwiseClone\(\)](https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone), 
 [object.ReferenceEquals\(object?, object?\)](https://learn.microsoft.com/dotnet/api/system.object.referenceequals), 
 [object.ToString\(\)](https://learn.microsoft.com/dotnet/api/system.object.tostring)
 
@@ -69,17 +68,27 @@ public VidPlayerStyleground(BinaryPacker.Element data)
 
 ## Properties
 
-### <a id="Celeste_Mod_VidPlayer_VidPlayerStyleground_Entity"></a> Entity
+### <a id="Celeste_Mod_VidPlayer_VidPlayerStyleground_Core"></a> Core
 
 ```csharp
-public VidPlayerEntity Entity { get; }
+public VidPlayerCore Core { get; }
 ```
 
 #### Property Value
 
- [VidPlayerEntity](Celeste.Mod.VidPlayer.VidPlayerEntity.md)
+ [VidPlayerCore](Celeste.Mod.VidPlayer.VidPlayerCore.md)
 
 ## Methods
+
+### <a id="Celeste_Mod_VidPlayer_VidPlayerStyleground_Ended_Monocle_Scene_"></a> Ended\(Scene\)
+
+```csharp
+public override void Ended(Scene scene)
+```
+
+#### Parameters
+
+`scene` Scene
 
 ### <a id="Celeste_Mod_VidPlayer_VidPlayerStyleground_Render_Monocle_Scene_"></a> Render\(Scene\)
 

@@ -24,6 +24,12 @@ public static class VidPlayerManager
 
 ## Methods
 
+### <a id="Celeste_Mod_VidPlayer_VidPlayerManager_Collect"></a> Collect\(\)
+
+```csharp
+public static void Collect()
+```
+
 ### <a id="Celeste_Mod_VidPlayer_VidPlayerManager_GetPlayerFor_System_String_"></a> GetPlayerFor\(string\)
 
 ```csharp

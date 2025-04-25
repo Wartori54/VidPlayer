@@ -5,12 +5,14 @@
   - name: Classes
   - name: SRTModImports
     href: Celeste.Mod.VidPlayer.SRTModImports.md
+  - name: VidPlayerCore
+    href: Celeste.Mod.VidPlayer.VidPlayerCore.md
   - name: VidPlayerEntity
     href: Celeste.Mod.VidPlayer.VidPlayerEntity.md
-  - name: VidPlayerEntity.Lua
-    href: Celeste.Mod.VidPlayer.VidPlayerEntity.Lua.md
-  - name: VidPlayerEntity.Lua.LuaHandle
-    href: Celeste.Mod.VidPlayer.VidPlayerEntity.Lua.LuaHandle.md
+  - name: VidPlayerEntityLua
+    href: Celeste.Mod.VidPlayer.VidPlayerEntityLua.md
+  - name: VidPlayerEntityLua.LuaHandle
+    href: Celeste.Mod.VidPlayer.VidPlayerEntityLua.LuaHandle.md
   - name: VidPlayerManager
     href: Celeste.Mod.VidPlayer.VidPlayerManager.md
   - name: VidPlayerManager.VidPlayerEntry

@@ -6,7 +6,7 @@ Assembly: VidPlayer.dll
 ```csharp
 [Tracked(false)]
 [CustomEntity(new string[] { "VidPlayer/VidPlayerEntity" })]
-public class VidPlayerEntity : Entity, IEnumerable<Component>, IEnumerable
+public sealed class VidPlayerEntity : Entity, IEnumerable<Component>, IEnumerable
 ```
 
 #### Inheritance
@@ -132,7 +132,6 @@ Entity.PostUpdate,
 [object.Equals\(object?, object?\)](https://learn.microsoft.com/dotnet/api/system.object.equals\#system\-object\-equals\(system\-object\-system\-object\)), 
 [object.GetHashCode\(\)](https://learn.microsoft.com/dotnet/api/system.object.gethashcode), 
 [object.GetType\(\)](https://learn.microsoft.com/dotnet/api/system.object.gettype), 
-[object.MemberwiseClone\(\)](https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone), 
 [object.ReferenceEquals\(object?, object?\)](https://learn.microsoft.com/dotnet/api/system.object.referenceequals), 
 [object.ToString\(\)](https://learn.microsoft.com/dotnet/api/system.object.tostring)
 
@@ -176,19 +175,17 @@ public VidPlayerEntity(Vector2 position, Vector2 entitySize, string videoTarget,
 
 `offset` Vector2
 
-## Fields
+## Properties
 
-### <a id="Celeste_Mod_VidPlayer_VidPlayerEntity_sceneless"></a> sceneless
+### <a id="Celeste_Mod_VidPlayer_VidPlayerEntity_Core"></a> Core
 
 ```csharp
-public bool sceneless
+public VidPlayerCore Core { get; }
 ```
 
-#### Field Value
+#### Property Value
 
- [bool](https://learn.microsoft.com/dotnet/api/system.boolean)
-
-## Properties
+ [VidPlayerCore](Celeste.Mod.VidPlayer.VidPlayerCore.md)
 
 ### <a id="Celeste_Mod_VidPlayer_VidPlayerEntity_Done"></a> Done
 
@@ -225,12 +222,6 @@ public override void Awake(Scene scene)
 
 `scene` Scene
 
-### <a id="Celeste_Mod_VidPlayer_VidPlayerEntity_RegisterSRTInterop"></a> RegisterSRTInterop\(\)
-
-```csharp
-public static void RegisterSRTInterop()
-```
-
 ### <a id="Celeste_Mod_VidPlayer_VidPlayerEntity_Removed_Monocle_Scene_"></a> Removed\(Scene\)
 
 Called when the Entity is removed from a Scene.
@@ -249,12 +240,6 @@ Draw the Entity here. Not called if the Entity is not Visible.
 
 ```csharp
 public override void Render()
-```
-
-### <a id="Celeste_Mod_VidPlayer_VidPlayerEntity_UnregisterSRTInterop"></a> UnregisterSRTInterop\(\)
-
-```csharp
-public static void UnregisterSRTInterop()
 ```
 
 ### <a id="Celeste_Mod_VidPlayer_VidPlayerEntity_Update"></a> Update\(\)

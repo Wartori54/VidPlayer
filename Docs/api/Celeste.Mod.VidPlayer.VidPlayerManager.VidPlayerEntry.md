@@ -79,3 +79,15 @@ public void Dispose()
 protected ~VidPlayerEntry()
 ```
 
+### <a id="Celeste_Mod_VidPlayer_VidPlayerManager_VidPlayerEntry_MarkForCollection"></a> MarkForCollection\(\)
+
+```csharp
+public void MarkForCollection()
+```
+
+### <a id="Celeste_Mod_VidPlayer_VidPlayerManager_VidPlayerEntry_SaveFromCollection"></a> SaveFromCollection\(\)
+
+```csharp
+public void SaveFromCollection()
+```
+

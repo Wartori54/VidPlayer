@@ -7,3 +7,5 @@ entities.VidPlayer/VidPlayerEntity.attributes.description.keepAspectRatio=If tru
 entities.VidPlayer/VidPlayerEntity.attributes.description.looping=If true the video will start over after ending.
 entities.VidPlayer/VidPlayerEntity.attributes.description.hires=When false the video will be downscaled to pixel-art form.
 entities.VidPlayer/VidPlayerEntity.attributes.description.volumeMult=Multiplier of the volume.
+
+style.effects.VidPlayer/VidPlayerStyleground.name=In-Game Video Player

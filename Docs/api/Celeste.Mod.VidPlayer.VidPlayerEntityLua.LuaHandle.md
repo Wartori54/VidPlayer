@@ -1,4 +1,4 @@
-# <a id="Celeste_Mod_VidPlayer_VidPlayerEntity_Lua_LuaHandle"></a> Class VidPlayerEntity.Lua.LuaHandle
+# <a id="Celeste_Mod_VidPlayer_VidPlayerEntityLua_LuaHandle"></a> Class VidPlayerEntityLua.LuaHandle
 
 Namespace: [Celeste.Mod.VidPlayer](Celeste.Mod.VidPlayer.md)  
 Assembly: VidPlayer.dll  
@@ -7,13 +7,13 @@ A handle usable in lua to manipulate VidPlayerEntities
 Call `RemoveSelf` on this to remove the entity. This handle won't be functional after the call.
 
 ```csharp
-public class VidPlayerEntity.Lua.LuaHandle
+public class VidPlayerEntityLua.LuaHandle
 ```
 
 #### Inheritance
 
 [object](https://learn.microsoft.com/dotnet/api/system.object) ← 
-[VidPlayerEntity.Lua.LuaHandle](Celeste.Mod.VidPlayer.VidPlayerEntity.Lua.LuaHandle.md)
+[VidPlayerEntityLua.LuaHandle](Celeste.Mod.VidPlayer.VidPlayerEntityLua.LuaHandle.md)
 
 #### Inherited Members
 
@@ -27,7 +27,7 @@ public class VidPlayerEntity.Lua.LuaHandle
 
 ## Constructors
 
-### <a id="Celeste_Mod_VidPlayer_VidPlayerEntity_Lua_LuaHandle__ctor_Celeste_Mod_VidPlayer_VidPlayerEntity_"></a> LuaHandle\(VidPlayerEntity\)
+### <a id="Celeste_Mod_VidPlayer_VidPlayerEntityLua_LuaHandle__ctor_Celeste_Mod_VidPlayer_VidPlayerEntity_"></a> LuaHandle\(VidPlayerEntity\)
 
 ```csharp
 public LuaHandle(VidPlayerEntity vidPlayerEntity)
@@ -39,7 +39,7 @@ public LuaHandle(VidPlayerEntity vidPlayerEntity)
 
 ## Properties
 
-### <a id="Celeste_Mod_VidPlayer_VidPlayerEntity_Lua_LuaHandle_Done"></a> Done
+### <a id="Celeste_Mod_VidPlayer_VidPlayerEntityLua_LuaHandle_Done"></a> Done
 
 Whether the video has finished, or always false if the video loops.
 
@@ -51,7 +51,7 @@ public bool Done { get; }
 
  [bool](https://learn.microsoft.com/dotnet/api/system.boolean)
 
-### <a id="Celeste_Mod_VidPlayer_VidPlayerEntity_Lua_LuaHandle_Muted"></a> Muted
+### <a id="Celeste_Mod_VidPlayer_VidPlayerEntityLua_LuaHandle_Muted"></a> Muted
 
 Whether audio is muted or playing.
 
@@ -63,7 +63,7 @@ public bool Muted { get; set; }
 
  [bool](https://learn.microsoft.com/dotnet/api/system.boolean)
 
-### <a id="Celeste_Mod_VidPlayer_VidPlayerEntity_Lua_LuaHandle_Visible"></a> Visible
+### <a id="Celeste_Mod_VidPlayer_VidPlayerEntityLua_LuaHandle_Visible"></a> Visible
 
 Whether the entity is or should be visible.
 
@@ -77,7 +77,7 @@ public bool Visible { get; set; }
 
 ## Methods
 
-### <a id="Celeste_Mod_VidPlayer_VidPlayerEntity_Lua_LuaHandle_RemoveSelf"></a> RemoveSelf\(\)
+### <a id="Celeste_Mod_VidPlayer_VidPlayerEntityLua_LuaHandle_RemoveSelf"></a> RemoveSelf\(\)
 
 ```csharp
 public void RemoveSelf()
