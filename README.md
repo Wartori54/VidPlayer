@@ -39,4 +39,6 @@ You can also set it as a styleground in loenn, hires will be forcefully disabled
 Its recommended that your video's resolutions is already 320x180 to prevent downscaling artifacts.
 
 ## Extra
-Playing the same video file in two players is supported as long as the settings are identical.
+Playing the same video file in two players is not supported.
+
+Savestates are safe and won't crash the game, but no further support for those is implemented.
