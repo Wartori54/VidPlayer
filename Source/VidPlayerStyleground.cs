@@ -7,10 +7,10 @@ namespace Celeste.Mod.VidPlayer;
 [CustomBackdrop("VidPlayer/VidPlayerStyleground")]
 public sealed class VidPlayerStyleground : Backdrop {
     private VidPlayerCore? core;
-    public VidPlayerCore Core => core;
+    public VidPlayerCore? Core => core;
     
     private Scene? currentScene;
-    private BinaryPacker.Element data;
+    private readonly BinaryPacker.Element data;
     
     public VidPlayerStyleground(BinaryPacker.Element data) {
         this.data = data;
@@ -63,7 +63,7 @@ public sealed class VidPlayerStyleground : Backdrop {
             this.owner = owner;
         }
 
-        protected override bool Paused => owner.currentScene?.Paused ?? true;
+        protected override bool Paused => (owner.currentScene?.Paused ?? true) || !owner.Visible;
         protected override Vector2 Position => Vector2.Zero;
     }
 
