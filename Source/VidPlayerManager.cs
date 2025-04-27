@@ -40,8 +40,9 @@ public static class VidPlayerManager {
     public record VidPlayerEntry : IDisposable {
         public readonly VideoPlayer videoPlayer;
         public readonly Video video;
-        private ModAsset asset;
+        public readonly ModAsset asset;
         private bool marked;
+        internal bool Marked => marked;
 
         private VidPlayerEntry(Video vid, VideoPlayer vidPlayer, ModAsset modAsset) {
             video = vid;
@@ -81,5 +82,44 @@ public static class VidPlayerManager {
             Console.WriteLine("VidPlayerManager died");
 #endif
         }
+    }
+    
+    // Commands
+    [Command("vp_alive_players", "Prints to console the amount and which video player instances are currently alive.")]
+    private static void GetAliveVideoPlayers() {
+        Engine.Commands.Log($"Currently alive players:");
+        int count = 0;
+        foreach ((ModAsset key, WeakReference<VidPlayerEntry> value) in players) {
+            if (value.TryGetTarget(out VidPlayerEntry? videoPlayer)) {
+                count++;
+                LogVideoPlayer(videoPlayer);
+            }
+        }
+        Engine.Commands.Log($"Total: {count}");
+    }
+
+    [Command("vp_collecting_players", "Gets the video players marked for collection.")]
+    private static void CollectingVideoPlayers() {
+        Engine.Commands.Log($"Collectable video players:");
+        foreach (VidPlayerEntry vidEntry in collectionList) {
+            LogVideoPlayer(vidEntry);
+        }
+        Engine.Commands.Log($"Total: {collectionList.Count}");
+    }
+
+    [Command("vp_force_gc", "Forces a gc collect call.")]
+    private static void ForceGc(bool aggresive = false) {
+        GC.Collect(GC.MaxGeneration, aggresive ? GCCollectionMode.Aggressive : GCCollectionMode.Forced, true, aggresive);
+    }
+
+    private static void LogVideoPlayer(VidPlayerEntry videoPlayer) {
+        Engine.Commands.Log($"- {videoPlayer.asset.PathVirtual}");
+        Engine.Commands.Log($"  IsDisposed: {videoPlayer.videoPlayer.IsDisposed}");
+        Engine.Commands.Log($"  IsLooped: {videoPlayer.videoPlayer.IsLooped}");
+        Engine.Commands.Log($"  IsMuted: {videoPlayer.videoPlayer.IsMuted}");
+        Engine.Commands.Log($"  State: {videoPlayer.videoPlayer.State}");
+        Engine.Commands.Log($"  Volume: {videoPlayer.videoPlayer.Volume}");
+        Engine.Commands.Log($"  PlayPosition: {videoPlayer.videoPlayer.PlayPosition}");
+        Engine.Commands.Log($"  Marked: {videoPlayer.Marked}");
     }
 }

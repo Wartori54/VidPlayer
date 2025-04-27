@@ -36,7 +36,6 @@ public sealed class VidPlayerStyleground : Backdrop {
             currentScene.Add(new UpdateFeederEntity(this));
             core?.Update();
         }
-        
     }
 
     private void ConsistentUpdate(Scene scene) {
@@ -76,7 +75,6 @@ public sealed class VidPlayerStyleground : Backdrop {
         }
 
         public override void Update() {
-            base.Update();
             owner.ConsistentUpdate(Scene);
         }
     }

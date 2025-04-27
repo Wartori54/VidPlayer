@@ -79,9 +79,12 @@ public sealed class VidPlayerEntity : Entity {
     }
 
     public override void Removed(Scene scene) {
-        core.videoPlayer?.Pause();
         base.Removed(scene);
-        
+        core.Mark();
+    }
+
+    public override void SceneEnd(Scene scene) {
+        base.SceneEnd(scene);
         core.Mark();
     }
 

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Reflection;
 using KeraLua;
+using Microsoft.Xna.Framework;
+using Monocle;
 using MonoMod.Cil;
 using MonoMod.ModInterop;
 using Scene = Monocle.Scene;
@@ -39,10 +41,10 @@ public class VidPlayerModule : EverestModule {
         // On.Monocle.Engine.OnSceneTransition += EngineOnOnSceneTransition;
         // On.Celeste.Level._GCCollect += LevelOn_GCCollect;
         // IL.Celeste.Level.Reload += ILLevelOnReload;
-        On.Celeste.Level.Update += LevelOnUpdate;
+        On.Monocle.Engine.Update += EngineOnUpdate;
     }
-    private static void LevelOnUpdate(On.Celeste.Level.orig_Update orig, Level self) {
-        orig(self);
+    private static void EngineOnUpdate(On.Monocle.Engine.orig_Update orig, Engine self, GameTime dt) {
+        orig(self, dt);
         VidPlayerManager.Collect();
     }
 

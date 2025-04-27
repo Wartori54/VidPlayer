@@ -124,6 +124,7 @@ public abstract class VidPlayerCore {
 
     public void Mark() {
         if (checkDisposed()) return;
+        videoPlayer!.Pause();
         vidEntry!.MarkForCollection();
     }
 
