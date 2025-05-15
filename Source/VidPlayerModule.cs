@@ -34,6 +34,7 @@ public class VidPlayerModule : EverestModule {
 
     private static MethodBase GC_Collect = typeof(GC).GetMethod(nameof(GC.Collect), []) ?? throw new InvalidOperationException("Cannot find GC.Collect()!");
     public override void Load() {
+        CheckFNAVersion();
         typeof(SRTModImports).ModInterop();
         VidPlayerCore.RegisterSRTInterop();
 
@@ -43,6 +44,7 @@ public class VidPlayerModule : EverestModule {
         // IL.Celeste.Level.Reload += ILLevelOnReload;
         On.Monocle.Engine.Update += EngineOnUpdate;
     }
+    
     private static void EngineOnUpdate(On.Monocle.Engine.orig_Update orig, Engine self, GameTime dt) {
         orig(self, dt);
         VidPlayerManager.Collect();
@@ -76,6 +78,18 @@ public class VidPlayerModule : EverestModule {
     private static void EngineOnOnSceneTransition(On.Monocle.Engine.orig_OnSceneTransition orig, Monocle.Engine self, Scene from, Scene to) {
         LuaCollect();
         orig(self, from, to);
+    }
+    
+    private void CheckFNAVersion() {
+        Version? fnaVersion = typeof(Game).Assembly.GetName().Version;
+        if (fnaVersion == null) {
+            Logger.Log(LogLevel.Error, nameof(VidPlayer), "Version-less FNA?");
+            return;
+        }
+        if (fnaVersion.Major != 23 || fnaVersion.Minor != 3) {
+            Logger.Log(LogLevel.Error, nameof(VidPlayer), $"Wrong FNA version detected (expected: 23.3.x.x, found: {fnaVersion}), " +
+                                                          $"incompatibilities may occur!");
+        }
     }
 
     // Just some interesting debugging code in case i ever need it again

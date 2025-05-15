@@ -4,6 +4,7 @@ using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
+using VideoPlayer = Celeste.Mod.VidPlayer.FNA_Reimpl.VideoPlayer2;
 using Monocle;
 
 namespace Celeste.Mod.VidPlayer;
@@ -67,7 +68,7 @@ public abstract class VidPlayerCore {
         videoPlayer!.IsLooped = looping;
         videoPlayer.IsMuted = muted;
         videoPlayer.Volume = 0; // Audio volume will be determined on first update instead
-        videoPlayer.Play(vidEntry!.video);
+        videoPlayer.Play(vidEntry!.video, vidEntry.usedHandle);
         videoPlayer.Pause();
         hasWoken = true;
     }

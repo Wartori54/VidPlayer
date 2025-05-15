@@ -9,6 +9,7 @@
         <CelestePrefix Condition="'$(CelestePrefix)' == '' And Exists('..\..\..\Celeste.dll')">..\..\..</CelestePrefix>
         <CelestePrefix Condition="'$(CelestePrefix)' == ''">lib-stripped</CelestePrefix>
         <ZippedFiles>..\everest.yaml;..\bin\**\*.*;..\Audio\**\*.*;..\Dialog\**\*.*;..\Graphics\**\*.*;..\Ahorn\**\*.*;..\Loenn\**\*.*</ZippedFiles>
+        <NativeLibs>..\native\**\*.*</NativeLibs>
     </PropertyGroup>
 
     <!--Disable "Copy Local" for all references-->
@@ -27,7 +28,7 @@
 <!--        <PackageReference Include="CelesteMod.Publicizer" Version="*" CelesteAssembly="$(CelestePrefix)\Celeste.dll"/>-->
         <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all"/>
         <Reference Include="$(CelestePrefix)\MMHOOK_Celeste.dll" Private="false"/>
-        <Reference Include="$(CelestePrefix)\FNA.dll" Private="false"/>
+        <Reference Include="$(CelestePrefix)\FNA.dll" Private="false" Publicize="true"/>
         <Reference Include="$(CelestePrefix)\NLua.dll" Private="false" Publicize="true"/>
         <Reference Include="$(CelestePrefix)\KeraLua.dll" Private="false" Publicize="true"/>
         <Reference Include="$(CelestePrefix)\Celeste.dll" Publicize="true">
@@ -35,9 +36,17 @@
         </Reference>
     </ItemGroup>
 
-    <Target Name="CopyFiles" AfterTargets="Build" Inputs="$(OutputPath)\$(AssemblyName).dll;$(OutputPath)\$(AssemblyName).pdb" Outputs="..\bin\$(AssemblyName).dll;..\bin\$(AssemblyName).pdb">
+    <ItemGroup>
+      <Folder Include="Theorasharp\" />
+    </ItemGroup>
+
+    <Target Name="CopyFiles" AfterTargets="Build">
         <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="..\bin"/>
         <Copy SourceFiles="$(OutputPath)\$(AssemblyName).pdb" DestinationFolder="..\bin"/>
+        <ItemGroup>
+            <_NativeLibs Include="$(NativeLibs)" />
+        </ItemGroup>
+        <Copy SourceFiles="@(_NativeLibs)" DestinationFolder="..\bin\%(RecursiveDir)" />
     </Target>
 
     <Target Name="PackageMod" AfterTargets="CopyFiles" Inputs="$(ZippedFiles)" Outputs="..\VidPlayer.zip" Condition="'$(Configuration)' == 'Release'">

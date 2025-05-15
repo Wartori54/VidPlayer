@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.Xna.Framework.Media;
+using VideoPlayer = Celeste.Mod.VidPlayer.FNA_Reimpl.VideoPlayer2;
 using Monocle;
 
 namespace Celeste.Mod.VidPlayer;
@@ -41,20 +42,22 @@ public static class VidPlayerManager {
         public readonly VideoPlayer videoPlayer;
         public readonly Video video;
         public readonly ModAsset asset;
+        public readonly string usedHandle;
         private bool marked;
         internal bool Marked => marked;
 
-        private VidPlayerEntry(Video vid, VideoPlayer vidPlayer, ModAsset modAsset) {
+        private VidPlayerEntry(Video vid, VideoPlayer vidPlayer, ModAsset modAsset, string usedPath) {
             video = vid;
             videoPlayer = vidPlayer;
             asset = modAsset;
+            usedHandle = usedPath;
         }
         
         public static VidPlayerEntry Create(ModAsset videoTargetAsset) {
             string cachePath = videoTargetAsset.GetCachedPath();
             Video video = Engine.Instance.Content.Load<Video>(cachePath);
             VideoPlayer videoPlayer = new();
-            return new VidPlayerEntry(video, videoPlayer, videoTargetAsset);
+            return new VidPlayerEntry(video, videoPlayer, videoTargetAsset, cachePath);
         }
 
         public void MarkForCollection() {

@@ -2,12 +2,8 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 using Celeste.Mod.Entities;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Media;
 using Monocle;
 
 namespace Celeste.Mod.VidPlayer;
