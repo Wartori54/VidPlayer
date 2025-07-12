@@ -1,0 +1,5 @@
+MODNAME_VIDPLAYER= VidPlayer
+
+MODOPTIONS_VIDPLAYER_DISABLEFNAPATCH= Disable FNA Theorafile patch
+MODOPTIONS_VIDPLAYER_DISABLEFNAPATCH_DESC= Disables a patch to make sure identical frames are properly displayed,
+do not enable unless you know what you are doing

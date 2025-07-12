@@ -1,7 +1,3 @@
-// Modified VideoPlayer.cs in order to use the bundled Theorafile
-// and to make it use granule positions instead of reading a frame
-// every 1/fps seconds.
-
 #region License
 /* FNA - XNA4 Reimplementation for Desktop Platforms
  * Copyright 2009-2023 Ethan Lee and the MonoGame Team
@@ -15,20 +11,15 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework;
+
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Media;
-using TheorafileTarget = TheorafileBun;
 #endregion
 
-#nullable disable
-
-namespace Celeste.Mod.VidPlayer.FNA_Reimpl
+namespace Microsoft.Xna.Framework.Media
 {
-	public sealed class VideoPlayer2 : IDisposable 
+	public sealed class VideoPlayer : IDisposable
 	{
-		private static bool Patch => !VidPlayerModule.Settings.DisableFNAPatch;
 		#region Hardware-accelerated YUV -> RGBA
 
 		private Effect shaderProgram;
@@ -89,7 +80,7 @@ namespace Celeste.Mod.VidPlayer.FNA_Reimpl
 			vertBuffer = new VertexBufferBinding(
 				new VertexBuffer(
 					currentDevice,
-					((IVertexType) new VertexPositionTexture()).VertexDeclaration,
+					VertexPositionTexture.VertexDeclaration,
 					4,
 					BufferUsage.WriteOnly
 				)
@@ -408,8 +399,6 @@ namespace Celeste.Mod.VidPlayer.FNA_Reimpl
 
 		#region Private Member Data: Theorafile
 
-		private IntPtr theora;
-
 		private IntPtr yuvData;
 		private int yuvDataLen;
 		private int currentFrame;
@@ -418,7 +407,6 @@ namespace Celeste.Mod.VidPlayer.FNA_Reimpl
 		private static readonly float[] audioData = new float[AUDIO_BUFFER_SIZE];
 		private static GCHandle audioHandle = GCHandle.Alloc(audioData, GCHandleType.Pinned);
 		private IntPtr audioDataPtr = audioHandle.AddrOfPinnedObject();
-		private long currentGPos = 0;
 
 		#endregion
 
@@ -466,7 +454,7 @@ namespace Celeste.Mod.VidPlayer.FNA_Reimpl
 
 		#region Public Methods: XNA VideoPlayer Implementation
 
-		public VideoPlayer2()
+		public VideoPlayer()
 		{
 			// Initialize public members.
 			IsDisposed = false;
@@ -528,54 +516,29 @@ namespace Celeste.Mod.VidPlayer.FNA_Reimpl
 
 			// Be sure we can even get something from Theorafile...
 			if (	State == MediaState.Stopped ||
-				theora == IntPtr.Zero ||
-				TheorafileTarget.tf_hasvideo(theora) == 0	)
+				Video.theora == IntPtr.Zero ||
+				Theorafile.tf_hasvideo(Video.theora) == 0	)
 			{
 				 // Screw it, give them the old one.
 				return videoTexture[0].RenderTarget as Texture2D;
 			}
 
-			if (Patch) {
-				TheorafileTarget.tf_granpos_dec(theora, currentGPos, out double sec, out _);
-				
-				// Make sure we are past the next frame time
-				if (sec * 1000 <= timer.ElapsedMilliseconds) {
-					// Only update the textures if we need to!
-					int rets = 0;
-					// Read as much as possible to keep up
-					// Note: do not use the current time since this can become really unstable
-					// if reading takes too long
-					long startMilis = timer.ElapsedMilliseconds;
-					while (sec * 1000 <= startMilis && TheorafileTarget.tf_eos(theora) != 1) {
-						rets += TheorafileTarget.tf_readvideo2(
-							theora,
-							yuvData,
-							1,
-							out currentGPos
-						);
-						TheorafileTarget.tf_granpos_dec(theora, currentGPos, out sec, out _);
-					}
-					if (rets > 0 || currentGPos < 0) {
-						UpdateTexture();
-					}
+			int thisFrame = (int) (timer.Elapsed.TotalMilliseconds / (1000.0 / Video.fps));
+			if (thisFrame > currentFrame)
+			{
+				// Only update the textures if we need to!
+				if (Theorafile.tf_readvideo(
+					Video.theora,
+					yuvData,
+					thisFrame - currentFrame
+				) == 1 || currentFrame == -1) {
+					UpdateTexture();
 				}
-			} else {
-				int thisFrame = (int) (timer.Elapsed.TotalMilliseconds / (1000.0 / Video.fps));
-				if (thisFrame > currentFrame) {
-					// Only update the textures if we need to!
-					if (Theorafile.tf_readvideo(
-						    theora,
-						    yuvData,
-						    thisFrame - currentFrame
-					    ) == 1 || currentFrame == -1) {
-						UpdateTexture();
-					}
-					currentFrame = thisFrame;
-				}
+				currentFrame = thisFrame;
 			}
 
 			// Check for the end...
-			bool ended = TheorafileTarget.tf_eos(theora) == 1;
+			bool ended = Theorafile.tf_eos(Video.theora) == 1;
 			if (audioStream != null)
 			{
 				ended &= audioStream.PendingBufferCount == 0;
@@ -601,7 +564,7 @@ namespace Celeste.Mod.VidPlayer.FNA_Reimpl
 				}
 
 				// Reset the stream no matter what happens next
-				TheorafileTarget.tf_reset(theora);
+				Theorafile.tf_reset(Video.theora);
 
 				// If looping, go back to the start. Otherwise, we'll be exiting.
 				if (IsLooped)
@@ -627,28 +590,17 @@ namespace Celeste.Mod.VidPlayer.FNA_Reimpl
 			return videoTexture[0].RenderTarget as Texture2D;
 		}
 
-		public void Play(Video video, string handle)
+		public void Play(Video video)
 		{
 			checkDisposed();
 
 			// We need to assign this regardless of what happens next.
 			Video = video;
 
-			if (theora != IntPtr.Zero) {
-				TheorafileTarget.tf_close(ref theora);
-				theora = IntPtr.Zero;
-			}
-
 			// FIXME: This is a part of the Duration hack!
 			if (Video.needsDurationHack)
 			{
 				Video.Duration = TimeSpan.MaxValue;
-			}
-			
-			TheorafileTarget.tf_fopen(handle, out theora);
-			if (theora == IntPtr.Zero)
-			{
-				throw new System.IO.FileNotFoundException(handle);
 			}
 
 			// Check the player state before attempting anything.
@@ -675,7 +627,7 @@ namespace Celeste.Mod.VidPlayer.FNA_Reimpl
 			InitializeTheoraStream();
 
 			// Set up the texture data
-			if (TheorafileTarget.tf_hasvideo(theora) == 1)
+			if (Theorafile.tf_hasvideo(Video.theora) == 1)
 			{
 				// The VideoPlayer will use the GraphicsDevice that is set now.
 				if (currentDevice != Video.GraphicsDevice)
@@ -740,7 +692,7 @@ namespace Celeste.Mod.VidPlayer.FNA_Reimpl
 				audioStream.Dispose();
 				audioStream = null;
 			}
-			TheorafileTarget.tf_reset(theora);
+			Theorafile.tf_reset(Video.theora);
 		}
 
 		public void Pause()
@@ -791,8 +743,8 @@ namespace Celeste.Mod.VidPlayer.FNA_Reimpl
 
 		private void OnBufferRequest(object sender, EventArgs args)
 		{
-			int samples = TheorafileTarget.tf_readaudio(
-				theora,
+			int samples = Theorafile.tf_readaudio(
+				Video.theora,
 				audioDataPtr,
 				AUDIO_BUFFER_SIZE
 			);
@@ -804,7 +756,7 @@ namespace Celeste.Mod.VidPlayer.FNA_Reimpl
 					samples
 				);
 			}
-			else if (TheorafileTarget.tf_eos(theora) == 1)
+			else if (Theorafile.tf_eos(Video.theora) == 1)
 			{
 				// Okay, we ran out. No need for this!
 				audioStream.BufferNeeded -= OnBufferRequest;
@@ -848,13 +800,13 @@ namespace Celeste.Mod.VidPlayer.FNA_Reimpl
 		private void InitializeTheoraStream()
 		{
 			// Grab the first video frame ASAP.
-			while (TheorafileTarget.tf_readvideo(theora, yuvData, 1) == 0);
+			while (Theorafile.tf_readvideo(Video.theora, yuvData, 1) == 0);
 
 			// Grab the first bit of audio. We're trying to start the decoding ASAP.
-			if (TheorafileTarget.tf_hasaudio(theora) == 1)
+			if (Theorafile.tf_hasaudio(Video.theora) == 1)
 			{
 				int channels, samplerate;
-				TheorafileTarget.tf_audioinfo(theora, out channels, out samplerate);
+				Theorafile.tf_audioinfo(Video.theora, out channels, out samplerate);
 				audioStream = new DynamicSoundEffectInstance(
 					samplerate,
 					(AudioChannels) channels
@@ -874,7 +826,6 @@ namespace Celeste.Mod.VidPlayer.FNA_Reimpl
 			}
 
 			currentFrame = -1;
-			currentGPos = -1;
 		}
 
 		#endregion
