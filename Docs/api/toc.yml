@@ -3,29 +3,7 @@
   href: Celeste.Mod.VidPlayer.md
   items:
   - name: Classes
-  - name: SRTModImports
-    href: Celeste.Mod.VidPlayer.SRTModImports.md
-  - name: VidPlayerCore
-    href: Celeste.Mod.VidPlayer.VidPlayerCore.md
-  - name: VidPlayerEntity
-    href: Celeste.Mod.VidPlayer.VidPlayerEntity.md
   - name: VidPlayerEntityLua
     href: Celeste.Mod.VidPlayer.VidPlayerEntityLua.md
   - name: VidPlayerEntityLua.LuaHandle
     href: Celeste.Mod.VidPlayer.VidPlayerEntityLua.LuaHandle.md
-  - name: VidPlayerManager
-    href: Celeste.Mod.VidPlayer.VidPlayerManager.md
-  - name: VidPlayerManager.VidPlayerEntry
-    href: Celeste.Mod.VidPlayer.VidPlayerManager.VidPlayerEntry.md
-  - name: VidPlayerModule
-    href: Celeste.Mod.VidPlayer.VidPlayerModule.md
-  - name: VidPlayerModuleSaveData
-    href: Celeste.Mod.VidPlayer.VidPlayerModuleSaveData.md
-  - name: VidPlayerModuleSession
-    href: Celeste.Mod.VidPlayer.VidPlayerModuleSession.md
-  - name: VidPlayerModuleSettings
-    href: Celeste.Mod.VidPlayer.VidPlayerModuleSettings.md
-  - name: VidPlayerStyleground
-    href: Celeste.Mod.VidPlayer.VidPlayerStyleground.md
-  - name: VidPlayerStylegroundReset
-    href: Celeste.Mod.VidPlayer.VidPlayerStylegroundReset.md

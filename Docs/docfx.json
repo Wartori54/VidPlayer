@@ -11,7 +11,8 @@
         }
       ],
       "dest": "api",
-      "outputFormat": "markdown"
+      "outputFormat": "markdown",
+      "filter": "filterConfig.yml"
     }
   ]
   

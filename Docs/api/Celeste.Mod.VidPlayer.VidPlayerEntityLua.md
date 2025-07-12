@@ -9,18 +9,8 @@ public class VidPlayerEntityLua
 
 #### Inheritance
 
-[object](https://learn.microsoft.com/dotnet/api/system.object) ← 
+object ← 
 [VidPlayerEntityLua](Celeste.Mod.VidPlayer.VidPlayerEntityLua.md)
-
-#### Inherited Members
-
-[object.Equals\(object?\)](https://learn.microsoft.com/dotnet/api/system.object.equals\#system\-object\-equals\(system\-object\)), 
-[object.Equals\(object?, object?\)](https://learn.microsoft.com/dotnet/api/system.object.equals\#system\-object\-equals\(system\-object\-system\-object\)), 
-[object.GetHashCode\(\)](https://learn.microsoft.com/dotnet/api/system.object.gethashcode), 
-[object.GetType\(\)](https://learn.microsoft.com/dotnet/api/system.object.gettype), 
-[object.MemberwiseClone\(\)](https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone), 
-[object.ReferenceEquals\(object?, object?\)](https://learn.microsoft.com/dotnet/api/system.object.referenceequals), 
-[object.ToString\(\)](https://learn.microsoft.com/dotnet/api/system.object.tostring)
 
 ## Methods
 
@@ -34,43 +24,43 @@ public static VidPlayerEntityLua.LuaHandle SpawnFullParameterized(string videoTa
 
 #### Parameters
 
-`videoTarget` [string](https://learn.microsoft.com/dotnet/api/system.string)
+`videoTarget` string
 
 The video file path.
 
-`x` [int](https://learn.microsoft.com/dotnet/api/system.int32)
+`x` int
 
 X position relative to the room we are currently in.
 
-`y` [int](https://learn.microsoft.com/dotnet/api/system.int32)
+`y` int
 
 Y position relative to the room we are currently in.
 
-`width` [int](https://learn.microsoft.com/dotnet/api/system.int32)
+`width` int
 
 Width of the video, in in-game pixels.
 
-`height` [int](https://learn.microsoft.com/dotnet/api/system.int32)
+`height` int
 
 Height of the video, in in-game pixels.
 
-`muted` [bool](https://learn.microsoft.com/dotnet/api/system.boolean)
+`muted` bool
 
 Whether audio plays.
 
-`hires` [bool](https://learn.microsoft.com/dotnet/api/system.boolean)
+`hires` bool
 
 Whether the video will be downscaled to celeste's gameplay resolution.
 
-`keepAspectRatio` [bool](https://learn.microsoft.com/dotnet/api/system.boolean)
+`keepAspectRatio` bool
 
 Whether to stretch the video to fit the given width/height or to keep the ratio width/height ratio from the video file.
 
-`looping` [bool](https://learn.microsoft.com/dotnet/api/system.boolean)
+`looping` bool
 
 Whether playback loops forever or stops after the video is over.
 
-`volumeMult` [float](https://learn.microsoft.com/dotnet/api/system.single)
+`volumeMult` float
 
 Real value to multiply the volume with, ranging from 0 to 1.
 
@@ -90,31 +80,31 @@ public static VidPlayerEntityLua.LuaHandle SpawnLoop(string videoTarget, int x, 
 
 #### Parameters
 
-`videoTarget` [string](https://learn.microsoft.com/dotnet/api/system.string)
+`videoTarget` string
 
 The video file path.
 
-`x` [int](https://learn.microsoft.com/dotnet/api/system.int32)
+`x` int
 
 X position relative to the room we are currently in.
 
-`y` [int](https://learn.microsoft.com/dotnet/api/system.int32)
+`y` int
 
 Y position relative to the room we are currently in.
 
-`width` [int](https://learn.microsoft.com/dotnet/api/system.int32)
+`width` int
 
 Width of the video, in in-game pixels.
 
-`height` [int](https://learn.microsoft.com/dotnet/api/system.int32)
+`height` int
 
 Height of the video, in in-game pixels.
 
-`muted` [bool](https://learn.microsoft.com/dotnet/api/system.boolean)
+`muted` bool
 
 Whether audio plays.
 
-`hires` [bool](https://learn.microsoft.com/dotnet/api/system.boolean)
+`hires` bool
 
 Whether the video will be downscaled to celeste's gameplay resolution.
 
@@ -134,37 +124,37 @@ public static IEnumerator SpawnOneShot(string videoTarget, int x, int y, int wid
 
 #### Parameters
 
-`videoTarget` [string](https://learn.microsoft.com/dotnet/api/system.string)
+`videoTarget` string
 
 The video file path.
 
-`x` [int](https://learn.microsoft.com/dotnet/api/system.int32)
+`x` int
 
 X position relative to the room we are currently in.
 
-`y` [int](https://learn.microsoft.com/dotnet/api/system.int32)
+`y` int
 
 Y position relative to the room we are currently in.
 
-`width` [int](https://learn.microsoft.com/dotnet/api/system.int32)
+`width` int
 
 Width of the video, in in-game pixels.
 
-`height` [int](https://learn.microsoft.com/dotnet/api/system.int32)
+`height` int
 
 Height of the video, in in-game pixels.
 
-`muted` [bool](https://learn.microsoft.com/dotnet/api/system.boolean)
+`muted` bool
 
 Whether audio plays.
 
-`hires` [bool](https://learn.microsoft.com/dotnet/api/system.boolean)
+`hires` bool
 
 Whether the video will be downscaled to celeste's gameplay resolution.
 
 #### Returns
 
- [IEnumerator](https://learn.microsoft.com/dotnet/api/system.collections.ienumerator)
+ IEnumerator
 
 An IEnumerator you can `coroutine.yield` in lua to execute it.
 

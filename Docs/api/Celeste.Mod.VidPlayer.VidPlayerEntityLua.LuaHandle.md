@@ -13,18 +13,8 @@ public class VidPlayerEntityLua.LuaHandle
 
 #### Inheritance
 
-[object](https://learn.microsoft.com/dotnet/api/system.object) ← 
+object ← 
 [VidPlayerEntityLua.LuaHandle](Celeste.Mod.VidPlayer.VidPlayerEntityLua.LuaHandle.md)
-
-#### Inherited Members
-
-[object.Equals\(object?\)](https://learn.microsoft.com/dotnet/api/system.object.equals\#system\-object\-equals\(system\-object\)), 
-[object.Equals\(object?, object?\)](https://learn.microsoft.com/dotnet/api/system.object.equals\#system\-object\-equals\(system\-object\-system\-object\)), 
-[object.GetHashCode\(\)](https://learn.microsoft.com/dotnet/api/system.object.gethashcode), 
-[object.GetType\(\)](https://learn.microsoft.com/dotnet/api/system.object.gettype), 
-[object.MemberwiseClone\(\)](https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone), 
-[object.ReferenceEquals\(object?, object?\)](https://learn.microsoft.com/dotnet/api/system.object.referenceequals), 
-[object.ToString\(\)](https://learn.microsoft.com/dotnet/api/system.object.tostring)
 
 ## Constructors
 
@@ -36,7 +26,7 @@ public LuaHandle(VidPlayerEntity vidPlayerEntity)
 
 #### Parameters
 
-`vidPlayerEntity` [VidPlayerEntity](Celeste.Mod.VidPlayer.VidPlayerEntity.md)
+`vidPlayerEntity` VidPlayerEntity
 
 ## Properties
 
@@ -50,7 +40,19 @@ public bool Done { get; }
 
 #### Property Value
 
- [bool](https://learn.microsoft.com/dotnet/api/system.boolean)
+ bool
+
+### <a id="Celeste_Mod_VidPlayer_VidPlayerEntityLua_LuaHandle_GlobalAlpha"></a> GlobalAlpha
+
+The current global alpha value.
+
+```csharp
+public float GlobalAlpha { get; set; }
+```
+
+#### Property Value
+
+ float
 
 ### <a id="Celeste_Mod_VidPlayer_VidPlayerEntityLua_LuaHandle_Muted"></a> Muted
 
@@ -62,7 +64,7 @@ public bool Muted { get; set; }
 
 #### Property Value
 
- [bool](https://learn.microsoft.com/dotnet/api/system.boolean)
+ bool
 
 ### <a id="Celeste_Mod_VidPlayer_VidPlayerEntityLua_LuaHandle_Paused"></a> Paused
 
@@ -74,7 +76,7 @@ public bool Paused { get; set; }
 
 #### Property Value
 
- [bool](https://learn.microsoft.com/dotnet/api/system.boolean)
+ bool
 
 ### <a id="Celeste_Mod_VidPlayer_VidPlayerEntityLua_LuaHandle_Visible"></a> Visible
 
@@ -86,7 +88,7 @@ public bool Visible { get; set; }
 
 #### Property Value
 
- [bool](https://learn.microsoft.com/dotnet/api/system.boolean)
+ bool
 
 ## Methods
 
