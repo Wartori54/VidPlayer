@@ -16,6 +16,7 @@ public abstract class VidPlayerCore {
     private readonly bool looping;
     internal bool hires;
     private readonly float volumeMult;
+    private float globalAlpha;
     private readonly MTexture fallback;
     private VidPlayerManager.VidPlayerEntry? vidEntry;
     private bool hasWoken = false;
@@ -28,6 +29,11 @@ public abstract class VidPlayerCore {
         get => muted;
         set => muted = value;
     }
+
+    public float GlobalAlpha {
+        get => globalAlpha;
+        set => globalAlpha = value;
+    }
     
     protected abstract bool Paused { get; }
     
@@ -39,7 +45,8 @@ public abstract class VidPlayerCore {
         bool entityKeepAspectRatio, 
         bool entityLooping, 
         bool entityHires, 
-        float entityVolumeMult) {
+        float entityVolumeMult,
+        float entityGlobalAlpha) {
         
         size = entitySize;
         muted = entityIsMuted;
@@ -47,6 +54,7 @@ public abstract class VidPlayerCore {
         looping = entityLooping;
         hires = entityHires;
         volumeMult = entityVolumeMult;
+        globalAlpha = entityGlobalAlpha;
 
         // Switch to this once it hits main
         // if (SRTModImports.IgnoreSaveState is { } cb) {
@@ -90,7 +98,7 @@ public abstract class VidPlayerCore {
     public void Render() {
         int scalingFactor = hires ? 6 : 1;
         if (checkDisposed()) {
-            fallback.Draw(Position * scalingFactor, Vector2.Zero, Color.White, MathF.Min(size.X / fallback.Width, size.Y / fallback.Height) * scalingFactor);
+            fallback.Draw(Position * scalingFactor, Vector2.Zero, Color.White * globalAlpha, MathF.Min(size.X / fallback.Width, size.Y / fallback.Height) * scalingFactor);
             return;
         }
         Texture2D currTexture = videoPlayer!.GetTexture();
@@ -110,7 +118,7 @@ public abstract class VidPlayerCore {
             }
             dstRect = new Rectangle((int)Position.X * scalingFactor, (int)Position.Y * scalingFactor, (int)finalSizeX * scalingFactor, (int)finalSizeY * scalingFactor);
         }
-        Draw.SpriteBatch.Draw(currTexture, dstRect, Color.White);
+        Draw.SpriteBatch.Draw(currTexture, dstRect, Color.White * globalAlpha);
     }
 
     public bool checkDisposed() {

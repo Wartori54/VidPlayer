@@ -7,6 +7,7 @@ entities.VidPlayer/VidPlayerEntity.attributes.description.keepAspectRatio=If tru
 entities.VidPlayer/VidPlayerEntity.attributes.description.looping=If true the video will start over after ending.
 entities.VidPlayer/VidPlayerEntity.attributes.description.hires=When false the video will be downscaled to pixel-art form.
 entities.VidPlayer/VidPlayerEntity.attributes.description.volumeMult=Multiplier of the volume.
+entities.VidPlayer/VidPlayerEntity.attributes.description.globalAlpha=Determines the Alpha value for the entire player (0 is fully transparent, 1 is fully opaque).
 
 triggers.VidPlayer/VidPlayerStylegroundReset.placements.name.vidPlayerStylegroundReset=In-Game Video Styleground Reset
 triggers.VidPlayer/VidPlayerStylegroundReset.attributes.description.tag=Stylegrounds with this tag will be reset.

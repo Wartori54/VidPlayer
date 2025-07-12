@@ -13,6 +13,9 @@ public static class VidPlayerManager {
     private static readonly HashSet<VidPlayerEntry> collectionList = new();
 
     public static VidPlayerEntry GetPlayerFor(string id) {
+        if (id == "") {
+            throw new FileNotFoundException("No file specified!");
+        }
         if (!Everest.Content.TryGet(id, out ModAsset videoTargetAsset)) {
             throw new FileNotFoundException("Could not find video target: " + id);
         }

@@ -24,7 +24,8 @@ public sealed class VidPlayerStyleground : Backdrop {
             data.AttrBool("keepAspectRatio", true),
             true /* always looping */,
             false /* TODO: hires stylegrounds */,
-            data.AttrFloat("volumeMult", 1));
+            data.AttrFloat("volumeMult", 1),
+            data.AttrFloat("globalAlpha"));
         core.Init();
     }
 
@@ -58,7 +59,7 @@ public sealed class VidPlayerStyleground : Backdrop {
     private class VidPlayerStylegroundCore : VidPlayerCore {
         private readonly VidPlayerStyleground owner;
         
-        public VidPlayerStylegroundCore(VidPlayerStyleground owner, Vector2 entitySize, string videoTarget, bool entityIsMuted, bool entityKeepAspectRatio, bool entityLooping, bool entityHires, float entityVolumeMult) : base(entitySize, videoTarget, entityIsMuted, entityKeepAspectRatio, entityLooping, entityHires, entityVolumeMult) {
+        public VidPlayerStylegroundCore(VidPlayerStyleground owner, Vector2 entitySize, string videoTarget, bool entityIsMuted, bool entityKeepAspectRatio, bool entityLooping, bool entityHires, float entityVolumeMult, float entityGlobalAlpha) : base(entitySize, videoTarget, entityIsMuted, entityKeepAspectRatio, entityLooping, entityHires, entityVolumeMult, entityGlobalAlpha) {
             this.owner = owner;
         }
 

@@ -18,12 +18,18 @@ vidPlayerEntity.placements = {
         looping = true,
         hires = true,
         volumeMult = 1,
+        globalAlpha = 1,
     }
 }
 vidPlayerEntity.fieldInformation = {
     volumeMult = {
         fieldType = "number",
         minimumValue = 0
+    },
+    globalAlpha = {
+        fieldType = "number",
+        minimumValue = 0,
+        maximumValue = 1,
     }
 }
 

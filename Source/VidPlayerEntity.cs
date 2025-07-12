@@ -22,15 +22,21 @@ public sealed class VidPlayerEntity : Entity {
         set => core.Muted = value;
     }
 
+    public float GlobalAlpha {
+        get => core.GlobalAlpha;
+        set => core.GlobalAlpha = value;
+    }
+
     public VidPlayerEntity(EntityData data, Vector2 offset)
         : this(data.Position,
             new Vector2(data.Width, data.Height),
-            data.String("video"),
+            data.String("video", ""),
             data.Bool("muted"),
             data.Bool("keepAspectRatio"),
             data.Bool("looping"),
             data.Bool("hires"),
             data.Float("volumeMult"),
+            data.Float("globalAlpha"),
             offset) {
     }
 
@@ -42,8 +48,9 @@ public sealed class VidPlayerEntity : Entity {
         bool entityLooping,
         bool entityHires,
         float entityVolumeMult,
+        float entityGlobalAlpha,
         Vector2 offset) : base(position + offset) {
-        core = new VidPlayerCoreEntity(this, entitySize, videoTarget, entityIsMuted, entityKeepAspectRatio, entityLooping, entityHires, entityVolumeMult);
+        core = new VidPlayerCoreEntity(this, entitySize, videoTarget, entityIsMuted, entityKeepAspectRatio, entityLooping, entityHires, entityVolumeMult, entityGlobalAlpha);
         Tag = Tags.PauseUpdate | Tags.TransitionUpdate;
         Depth = Depths.Top;
 
@@ -87,7 +94,7 @@ public sealed class VidPlayerEntity : Entity {
     private class VidPlayerCoreEntity : VidPlayerCore {
         private readonly VidPlayerEntity owner;
 
-        public VidPlayerCoreEntity(VidPlayerEntity owner, Vector2 entitySize, string videoTarget, bool entityIsMuted, bool entityKeepAspectRatio, bool entityLooping, bool entityHires, float entityVolumeMult) : base(entitySize, videoTarget, entityIsMuted, entityKeepAspectRatio, entityLooping, entityHires, entityVolumeMult) {
+        public VidPlayerCoreEntity(VidPlayerEntity owner, Vector2 entitySize, string videoTarget, bool entityIsMuted, bool entityKeepAspectRatio, bool entityLooping, bool entityHires, float entityVolumeMult, float entityGlobalAlpha) : base(entitySize, videoTarget, entityIsMuted, entityKeepAspectRatio, entityLooping, entityHires, entityVolumeMult, entityGlobalAlpha) {
             this.owner = owner;
         }
 
@@ -120,7 +127,7 @@ public class VidPlayerEntityLua {
             Logger.Error(nameof(VidPlayer), "Tried to spawn video player on non-level scene!");
             return null!;
         }
-        VidPlayerEntity vidPlayerEntity = new(new Vector2(x, y), new Vector2(width, height), videoTarget, muted, true, true, hires, 1f, level.LevelOffset);
+        VidPlayerEntity vidPlayerEntity = new(new Vector2(x, y), new Vector2(width, height), videoTarget, muted, true, true, hires, 1f, 1f, level.LevelOffset);
         level.Add(vidPlayerEntity);
         return new LuaHandle(vidPlayerEntity);
     }
@@ -181,7 +188,7 @@ public class VidPlayerEntityLua {
             Logger.Error(nameof(VidPlayer), "Tried to spawn video player on non-level scene!");
             return null!;
         }
-        VidPlayerEntity vidPlayerEntity = new(new Vector2(x, y), new Vector2(width, height), videoTarget, muted, keepAspectRatio, looping, hires, volumeMult, level.LevelOffset);
+        VidPlayerEntity vidPlayerEntity = new(new Vector2(x, y), new Vector2(width, height), videoTarget, muted, keepAspectRatio, looping, hires, volumeMult, 1f, level.LevelOffset);
         level.Add(vidPlayerEntity);
 
         return new LuaHandle(vidPlayerEntity);
@@ -230,6 +237,17 @@ public class VidPlayerEntityLua {
             set {
                 VidPlayerEntity? @ref = getRef();
                 if (@ref != null) @ref.ForcePause = value;
+            }
+        }
+
+        /// <summary>
+        /// The current global alpha value.
+        /// </summary>
+        public float GlobalAlpha {
+            get => getRef()?.GlobalAlpha ?? 1f;
+            set {
+                VidPlayerEntity? @ref = getRef();
+                if (@ref != null) @ref.GlobalAlpha = value;
             }
         }
 
