@@ -20,6 +20,7 @@ public static class VidPlayerManager {
             throw new FileNotFoundException("Could not find video target: " + id);
         }
         if (players.TryGetValue(videoTargetAsset, out WeakReference<VidPlayerEntry>? weakRef) && weakRef.TryGetTarget(out VidPlayerEntry? entry) && !entry.videoPlayer.IsDisposed) {
+            entry.SaveFromCollection();
             return entry;
         }
         entry = VidPlayerEntry.Create(videoTargetAsset);

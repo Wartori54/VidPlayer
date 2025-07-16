@@ -80,6 +80,7 @@ public abstract class VidPlayerCore {
 
     public void Init() {
         if (CheckDisposed()) return;
+        videoPlayer!.Stop();
         videoPlayer!.IsLooped = looping;
         videoPlayer.IsMuted = muted;
         videoPlayer.Volume = 0; // Audio volume will be determined on first update instead

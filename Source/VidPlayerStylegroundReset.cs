@@ -19,7 +19,6 @@ public class VidPlayerStylegroundReset : Trigger {
         foreach (Backdrop backdrop in SceneAs<Level>().Background.Backdrops) {
             if (backdrop is VidPlayerStyleground vps && backdrop.Tags.Contains(stTag)) {
                 vps.Core?.Reset();
-                
             }
         }
     }
