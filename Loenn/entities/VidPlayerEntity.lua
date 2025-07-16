@@ -35,15 +35,11 @@ vidPlayerEntity.fieldInformation = {
 }
 
 function vidPlayerEntity.sprite(room, entity)
-    local rect = drawableRectangle.fromRectangle("bordered", entity.x-entity.width/2, entity.y-entity.height/2, entity.width, entity.height,  {0, 0, 0, 0.5}, "Black")
+    local rect = drawableRectangle.fromRectangle("bordered", entity.x, entity.y, entity.width, entity.height,  {0, 0, 0, 0.5}, "Black")
     local icon = drawableSprite.fromTexture("VidPlayerEntity/play_icon", entity)
+    icon:addPosition(entity.width/2, entity.height/2)
     
-    --icon:addPosition(entity.width/2, entity.height/2)
     return {rect, icon}
-end
-
-function vidPlayerEntity.selection(room, entity)
-    return utils.rectangle(entity.x-entity.width/2, entity.y-entity.height/2, entity.width, entity.height), {}
 end
 
 
