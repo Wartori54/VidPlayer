@@ -7,3 +7,5 @@
   OptionalDependencies:
     - Name: SpeedrunTool
       Version: 3.24.3
+    - Name: ExtendedCameraDynamics
+      Version: 1.0.9

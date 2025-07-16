@@ -36,6 +36,7 @@ public class VidPlayerModule : EverestModule {
     public override void Load() {
         CheckFNAVersion();
         typeof(SRTModImports).ModInterop();
+        typeof(ExCamModImports).ModInterop();
         VidPlayerCore.RegisterSRTInterop();
 
         // These completely break savestates...

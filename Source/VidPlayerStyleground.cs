@@ -18,7 +18,7 @@ public sealed class VidPlayerStyleground : Backdrop {
 
     private void Load() {
         core?.Mark();
-        core = new VidPlayerStylegroundCore(this, new Vector2(320, 180),
+        core = new VidPlayerStylegroundCore(this,
             data.Attr("video"),
             data.AttrBool("muted", true),
             data.AttrBool("keepAspectRatio", true),
@@ -40,7 +40,7 @@ public sealed class VidPlayerStyleground : Backdrop {
     }
 
     private void ConsistentUpdate(Scene scene) {
-        if (core?.checkDisposed() ?? true) { // Try to revive it
+        if (core?.CheckDisposed() ?? true) { // Try to revive it
             Load();
         }
         core?.Update();
@@ -59,12 +59,20 @@ public sealed class VidPlayerStyleground : Backdrop {
     private class VidPlayerStylegroundCore : VidPlayerCore {
         private readonly VidPlayerStyleground owner;
         
-        public VidPlayerStylegroundCore(VidPlayerStyleground owner, Vector2 entitySize, string videoTarget, bool entityIsMuted, bool entityKeepAspectRatio, bool entityLooping, bool entityHires, float entityVolumeMult, float entityGlobalAlpha) : base(entitySize, videoTarget, entityIsMuted, entityKeepAspectRatio, entityLooping, entityHires, entityVolumeMult, entityGlobalAlpha) {
+        public VidPlayerStylegroundCore(VidPlayerStyleground owner, string videoTarget, bool entityIsMuted, bool entityKeepAspectRatio, bool entityLooping, bool entityHires, float entityVolumeMult, float entityGlobalAlpha) : base(Vector2.Zero, videoTarget, entityIsMuted, entityKeepAspectRatio, entityLooping, entityHires, entityVolumeMult, entityGlobalAlpha) {
             this.owner = owner;
         }
 
         protected override bool Paused => (owner.currentScene?.Paused ?? true) || !owner.Visible;
         protected override Vector2 Position => Vector2.Zero;
+
+        protected override Level? CurrentLevel => owner.currentScene as Level;
+
+        protected override Vector2 GetEntitySize() {
+            if (ExCamModImports.GetCameraDimensions == null || owner.currentScene == null)
+                return new Vector2(320, 160);
+            return ExCamModImports.GetCameraDimensions.Invoke((Level)owner.currentScene);
+        }
     }
 
     // Styleground are updated in weird ways, and don't have tags, so lets hack it!

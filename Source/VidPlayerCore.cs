@@ -10,11 +10,11 @@ using Monocle;
 namespace Celeste.Mod.VidPlayer;
 
 public abstract class VidPlayerCore {
-    private readonly Vector2 size;
+    private readonly Vector2 fixedEntitySize;
     private bool muted;
     private readonly bool keepAspectRatio;
     private readonly bool looping;
-    internal bool hires;
+    private bool hires;
     private readonly float volumeMult;
     private float globalAlpha;
     private readonly MTexture fallback;
@@ -23,6 +23,8 @@ public abstract class VidPlayerCore {
     
     // For handyness
     internal VideoPlayer? videoPlayer => vidEntry?.videoPlayer;
+    private float CurrScaleFactor => 6 * (CurrentLevel?.Zoom ?? 1);
+    public bool Hires => hires;
     
     public bool Done => vidEntry == null || hasWoken && (videoPlayer?.State ?? (MediaState)(-1)) == MediaState.Stopped;
     public bool Muted {
@@ -38,8 +40,10 @@ public abstract class VidPlayerCore {
     protected abstract bool Paused { get; }
     
     protected abstract Vector2 Position { get; }
+    
+    protected abstract Level? CurrentLevel { get; }
 
-    public VidPlayerCore(Vector2 entitySize, 
+    protected VidPlayerCore(Vector2 entitySize, 
         string videoTarget, 
         bool entityIsMuted, 
         bool entityKeepAspectRatio, 
@@ -48,7 +52,7 @@ public abstract class VidPlayerCore {
         float entityVolumeMult,
         float entityGlobalAlpha) {
         
-        size = entitySize;
+        fixedEntitySize = entitySize;
         muted = entityIsMuted;
         keepAspectRatio = entityKeepAspectRatio;
         looping = entityLooping;
@@ -72,7 +76,7 @@ public abstract class VidPlayerCore {
     }
 
     public void Init() {
-        if (checkDisposed()) return;
+        if (CheckDisposed()) return;
         videoPlayer!.IsLooped = looping;
         videoPlayer.IsMuted = muted;
         videoPlayer.Volume = 0; // Audio volume will be determined on first update instead
@@ -82,7 +86,7 @@ public abstract class VidPlayerCore {
     }
 
     public void Update() {
-        if (checkDisposed()) return;
+        if (CheckDisposed()) return;
         float normVolume = Settings.Instance.MusicVolume / 10f /* Max volume */ * volumeMult;
         normVolume = Math.Clamp(normVolume, 0f, 1f);
         // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -96,15 +100,16 @@ public abstract class VidPlayerCore {
     }
 
     public void Render() {
-        int scalingFactor = hires ? 6 : 1;
-        if (checkDisposed()) {
+        Vector2 size = GetEntitySize();
+        float scalingFactor = hires ? CurrScaleFactor : 1;
+        if (CheckDisposed()) {
             fallback.Draw(Position * scalingFactor, Vector2.Zero, Color.White * globalAlpha, MathF.Min(size.X / fallback.Width, size.Y / fallback.Height) * scalingFactor);
             return;
         }
         Texture2D currTexture = videoPlayer!.GetTexture();
         Rectangle dstRect;
         if (!keepAspectRatio) {
-            dstRect = new Rectangle((int)Position.X * scalingFactor, (int)Position.Y * scalingFactor, (int)size.X * scalingFactor, (int)size.Y * scalingFactor);
+            dstRect = new Rectangle((int)(Position.X * scalingFactor), (int)(Position.Y * scalingFactor), (int)(size.X * scalingFactor), (int)(size.Y * scalingFactor));
         } else {
             float ratio = vidEntry!.video.Width / (float)vidEntry.video.Height;
             float finalSizeX;
@@ -116,12 +121,12 @@ public abstract class VidPlayerCore {
                 finalSizeX = size.X;
                 finalSizeY = size.X / ratio;
             }
-            dstRect = new Rectangle((int)Position.X * scalingFactor, (int)Position.Y * scalingFactor, (int)finalSizeX * scalingFactor, (int)finalSizeY * scalingFactor);
+            dstRect = new Rectangle((int)(Position.X * scalingFactor), (int)(Position.Y * scalingFactor), (int)(finalSizeX * scalingFactor), (int)(finalSizeY * scalingFactor));
         }
         Draw.SpriteBatch.Draw(currTexture, dstRect, Color.White * globalAlpha);
     }
 
-    public bool checkDisposed() {
+    public bool CheckDisposed() {
         if (vidEntry == null) return true;
         if (vidEntry.videoPlayer.IsDisposed) {
             vidEntry = null;
@@ -132,24 +137,28 @@ public abstract class VidPlayerCore {
     }
 
     public void Mark() {
-        if (checkDisposed()) return;
+        if (CheckDisposed()) return;
         videoPlayer!.Pause();
         vidEntry!.MarkForCollection();
     }
 
     public void Reset() {
-        if (checkDisposed()) return;
+        if (CheckDisposed()) return;
         videoPlayer!.Stop();
         Init();
     }
+
+    protected virtual Vector2 GetEntitySize() {
+        return fixedEntitySize;
+    }
     
     protected virtual void SaveState(Level newLevel) {
-        if (checkDisposed()) return;
+        if (CheckDisposed()) return;
         videoPlayer!.Pause();
     }
 
     protected virtual void LoadState(Level newLevel) {
-        if (checkDisposed()) return;
+        if (CheckDisposed()) return;
         vidEntry!.SaveFromCollection();
         videoPlayer!.Pause();
     }

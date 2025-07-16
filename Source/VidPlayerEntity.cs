@@ -62,7 +62,7 @@ public sealed class VidPlayerEntity : Entity {
 #if DEBUG // Just for quick debug rendering
         Collider = new Hitbox(entitySize.X, entitySize.Y);
 #endif
-        if (core.hires)
+        if (core.Hires)
             Tag |= TagsExt.SubHUD;
     }
 
@@ -99,7 +99,9 @@ public sealed class VidPlayerEntity : Entity {
         }
 
         protected override bool Paused => owner.Scene.Paused || owner.SceneAs<Level>().Transitioning || owner.ForcePause;
-        protected override Vector2 Position => hires ? owner.Position - owner.SceneAs<Level>().Camera.Position : owner.Position;
+        protected override Vector2 Position => Hires ? owner.Position - owner.SceneAs<Level>().Camera.Position : owner.Position;
+
+        protected override Level? CurrentLevel => owner.SceneAs<Level>();
 
         protected override void LoadState(Level newLevel) {
             base.LoadState(newLevel);
