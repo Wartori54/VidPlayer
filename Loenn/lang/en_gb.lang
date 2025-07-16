@@ -8,8 +8,15 @@ entities.VidPlayer/VidPlayerEntity.attributes.description.looping=If true the vi
 entities.VidPlayer/VidPlayerEntity.attributes.description.hires=When false the video will be downscaled to pixel-art form.
 entities.VidPlayer/VidPlayerEntity.attributes.description.volumeMult=Multiplier of the volume.
 entities.VidPlayer/VidPlayerEntity.attributes.description.globalAlpha=Determines the Alpha value for the entire player (0 is fully transparent, 1 is fully opaque).
+entities.VidPlayer/VidPlayerEntity.attributes.description.centered=Centers the video when keepAspectRatio is true.
 
 triggers.VidPlayer/VidPlayerStylegroundReset.placements.name.vidPlayerStylegroundReset=In-Game Video Styleground Reset
 triggers.VidPlayer/VidPlayerStylegroundReset.attributes.description.tag=Stylegrounds with this tag will be reset.
 
 style.effects.VidPlayer/VidPlayerStyleground.name=In-Game Video Player
+style.effects.VidPlayer/VidPlayerStyleground.description.video=The OGV video source to play, formated as "ModName:/absolute/path/to/file.ogv".
+style.effects.VidPlayer/VidPlayerStyleground.description.muted=Whether the video's audio plays or not.
+style.effects.VidPlayer/VidPlayerStyleground.description.keepAspectRatio=If true the video won't stretch to fit the given target dimensions.
+style.effects.VidPlayer/VidPlayerStyleground.description.volumeMult=Multiplier of the volume.
+style.effects.VidPlayer/VidPlayerStyleground.description.centered=Centers the video when keepAspectRatio is true.
+
