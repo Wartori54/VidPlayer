@@ -25,7 +25,8 @@ public sealed class VidPlayerStyleground : Backdrop {
             true /* always looping */,
             false /* TODO: hires stylegrounds */,
             data.AttrFloat("volumeMult", 1),
-            data.AttrFloat("globalAlpha"));
+            data.AttrFloat("globalAlpha"),
+            data.AttrBool("centered", false));
         core.Init();
     }
 
@@ -59,7 +60,8 @@ public sealed class VidPlayerStyleground : Backdrop {
     private class VidPlayerStylegroundCore : VidPlayerCore {
         private readonly VidPlayerStyleground owner;
         
-        public VidPlayerStylegroundCore(VidPlayerStyleground owner, string videoTarget, bool entityIsMuted, bool entityKeepAspectRatio, bool entityLooping, bool entityHires, float entityVolumeMult, float entityGlobalAlpha) : base(Vector2.Zero, videoTarget, entityIsMuted, entityKeepAspectRatio, entityLooping, entityHires, entityVolumeMult, entityGlobalAlpha) {
+        public VidPlayerStylegroundCore(VidPlayerStyleground owner, string videoTarget, bool entityIsMuted, bool entityKeepAspectRatio, bool entityLooping, bool entityHires, float entityVolumeMult, float entityGlobalAlpha, bool centered) 
+            : base(Vector2.Zero, videoTarget, entityIsMuted, entityKeepAspectRatio, entityLooping, entityHires, entityVolumeMult, entityGlobalAlpha, centered) {
             this.owner = owner;
         }
 

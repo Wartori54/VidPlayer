@@ -20,6 +20,7 @@ public abstract class VidPlayerCore {
     private readonly MTexture fallback;
     private VidPlayerManager.VidPlayerEntry? vidEntry;
     private bool hasWoken = false;
+    private readonly bool centered;
     
     // For handyness
     internal VideoPlayer? videoPlayer => vidEntry?.videoPlayer;
@@ -50,7 +51,8 @@ public abstract class VidPlayerCore {
         bool entityLooping, 
         bool entityHires, 
         float entityVolumeMult,
-        float entityGlobalAlpha) {
+        float entityGlobalAlpha,
+        bool centeredKeepRatio) {
         
         fixedEntitySize = entitySize;
         muted = entityIsMuted;
@@ -59,6 +61,7 @@ public abstract class VidPlayerCore {
         hires = entityHires;
         volumeMult = entityVolumeMult;
         globalAlpha = entityGlobalAlpha;
+        centered = centeredKeepRatio;
 
         // Switch to this once it hits main
         // if (SRTModImports.IgnoreSaveState is { } cb) {
@@ -112,16 +115,22 @@ public abstract class VidPlayerCore {
             dstRect = new Rectangle((int)(Position.X * scalingFactor), (int)(Position.Y * scalingFactor), (int)(size.X * scalingFactor), (int)(size.Y * scalingFactor));
         } else {
             float ratio = vidEntry!.video.Width / (float)vidEntry.video.Height;
+            float finalPosX = Position.X;
+            float finalPosY = Position.Y;
             float finalSizeX;
             float finalSizeY;
             if (size.X / size.Y > ratio) {
                 finalSizeX = size.Y * ratio;
                 finalSizeY = size.Y;
+                if (centered)
+                    finalPosX = Position.X + size.X/2 - finalSizeX/2;
             } else {
                 finalSizeX = size.X;
                 finalSizeY = size.X / ratio;
+                if (centered)
+                    finalPosY = Position.Y + size.Y/2 - finalSizeY/2;
             }
-            dstRect = new Rectangle((int)(Position.X * scalingFactor), (int)(Position.Y * scalingFactor), (int)(finalSizeX * scalingFactor), (int)(finalSizeY * scalingFactor));
+            dstRect = new Rectangle((int)(finalPosX * scalingFactor), (int)(finalPosY * scalingFactor), (int)(finalSizeX * scalingFactor), (int)(finalSizeY * scalingFactor));
         }
         Draw.SpriteBatch.Draw(currTexture, dstRect, Color.White * globalAlpha);
     }

@@ -19,6 +19,7 @@ vidPlayerEntity.placements = {
         hires = true,
         volumeMult = 1,
         globalAlpha = 1,
+        centered = false,
     }
 }
 vidPlayerEntity.fieldInformation = {

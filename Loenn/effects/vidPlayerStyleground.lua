@@ -10,6 +10,7 @@ vidPlayerStyleground.defaultData = {
     keepAspectRatio = true,
     volumeMult = 1,
     globalAlpha = 1,
+    centered = false,
 }
 
 vidPlayerStyleground.fieldInformation = {
