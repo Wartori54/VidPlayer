@@ -90,6 +90,18 @@ public bool Visible { get; set; }
 
  bool
 
+### <a id="Celeste_Mod_VidPlayer_VidPlayerEntityLua_LuaHandle_Volume"></a> Volume
+
+Audio volume, ranges from 0 to 1.
+
+```csharp
+public float Volume { get; set; }
+```
+
+#### Property Value
+
+ float
+
 ## Methods
 
 ### <a id="Celeste_Mod_VidPlayer_VidPlayerEntityLua_LuaHandle_RemoveSelf"></a> RemoveSelf\(\)

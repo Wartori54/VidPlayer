@@ -15,7 +15,7 @@ public abstract class VidPlayerCore {
     private readonly bool keepAspectRatio;
     private readonly bool looping;
     private bool hires;
-    private readonly float volumeMult;
+    private float volumeMult;
     private float globalAlpha;
     private readonly MTexture fallback;
     private VidPlayerManager.VidPlayerEntry? vidEntry;
@@ -31,6 +31,11 @@ public abstract class VidPlayerCore {
     public bool Muted {
         get => muted;
         set => muted = value;
+    }
+
+    public float VolumeMult {
+        get => volumeMult;
+        set => volumeMult = value;
     }
 
     public float GlobalAlpha {

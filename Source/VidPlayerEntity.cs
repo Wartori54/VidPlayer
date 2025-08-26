@@ -22,6 +22,11 @@ public sealed class VidPlayerEntity : Entity {
         set => core.Muted = value;
     }
 
+    public float Volume {
+        get => core.VolumeMult;
+        set => core.VolumeMult = value;
+    }
+
     public float GlobalAlpha {
         get => core.GlobalAlpha;
         set => core.GlobalAlpha = value;
@@ -231,6 +236,17 @@ public class VidPlayerEntityLua {
             set {
                 VidPlayerEntity? @ref = getRef();
                 if (@ref != null) @ref.Muted = value;
+            }
+        }
+
+        /// <summary>
+        /// Audio volume, ranges from 0 to 1.
+        /// </summary>
+        public float Volume {
+            get => getRef()?.Volume ?? 0f;
+            set {
+                VidPlayerEntity? @ref = getRef();
+                if (@ref != null) @ref.Volume = value;
             }
         }
 
