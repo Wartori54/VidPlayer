@@ -20,6 +20,9 @@ vidPlayerEntity.placements = {
         volumeMult = 1,
         globalAlpha = 1,
         centered = false,
+        chromaKey = "",
+        entityChromaKeyTolAbs = 0,
+        entityChromaKeyTolRel = 0,
     }
 }
 vidPlayerEntity.fieldInformation = {
@@ -31,6 +34,16 @@ vidPlayerEntity.fieldInformation = {
         fieldType = "number",
         minimumValue = 0,
         maximumValue = 1,
+    },
+    chromaKey = {
+        fieldType = "color",
+        allowEmpty = true,
+    },
+    entityChromaKeyTolAbs = {
+        fieldType = "number"
+    },
+    entityChromaKeyTolRel = {
+        fieldType = "number"
     }
 }
 

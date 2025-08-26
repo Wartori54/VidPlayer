@@ -43,6 +43,9 @@ public sealed class VidPlayerEntity : Entity {
             data.Float("volumeMult"),
             data.Float("globalAlpha"),
             data.Bool("centered"),
+            data.Has("chromaKey") && !string.IsNullOrEmpty(data.Attr("chromaKey")) ? data.HexColor("chromaKey") : null,
+            data.Float("entityChromaKeyTolAbs"),
+            data.Float("entityChromaKeyTolRel"),
             offset) {
     }
 
@@ -56,8 +59,22 @@ public sealed class VidPlayerEntity : Entity {
         float entityVolumeMult,
         float entityGlobalAlpha,
         bool centered,
+        Color? entityChromaKey,
+        float entityChromaKeyTolAbs,
+        float entityChromaKeyTolRel,
         Vector2 offset) : base(position + offset) {
-        core = new VidPlayerCoreEntity(this, entitySize, videoTarget, entityIsMuted, entityKeepAspectRatio, entityLooping, entityHires, entityVolumeMult, entityGlobalAlpha, centered);
+        VidPlayerCore.CoreConfig config = new(entitySize,
+            entityIsMuted,
+            entityKeepAspectRatio,
+            entityLooping,
+            entityHires,
+            entityVolumeMult,
+            entityGlobalAlpha,
+            centered,
+            entityChromaKey,
+            entityChromaKeyTolAbs,
+            entityChromaKeyTolRel);
+        core = new VidPlayerCoreEntity(this, videoTarget, config);
         Tag = Tags.PauseUpdate | Tags.TransitionUpdate;
         Depth = Depths.Top;
 
@@ -101,8 +118,8 @@ public sealed class VidPlayerEntity : Entity {
     private class VidPlayerCoreEntity : VidPlayerCore {
         private readonly VidPlayerEntity owner;
 
-        public VidPlayerCoreEntity(VidPlayerEntity owner, Vector2 entitySize, string videoTarget, bool entityIsMuted, bool entityKeepAspectRatio, bool entityLooping, bool entityHires, float entityVolumeMult, float entityGlobalAlpha, bool centered) 
-            : base(entitySize, videoTarget, entityIsMuted, entityKeepAspectRatio, entityLooping, entityHires, entityVolumeMult, entityGlobalAlpha, centered) {
+        public VidPlayerCoreEntity(VidPlayerEntity owner, string videoTarget, CoreConfig config) 
+            : base(videoTarget, config) {
             this.owner = owner;
         }
 
@@ -137,7 +154,7 @@ public class VidPlayerEntityLua {
             Logger.Error(nameof(VidPlayer), "Tried to spawn video player on non-level scene!");
             return null!;
         }
-        VidPlayerEntity vidPlayerEntity = new(new Vector2(x, y), new Vector2(width, height), videoTarget, muted, true, true, hires, 1f, 1f, false, level.LevelOffset);
+        VidPlayerEntity vidPlayerEntity = new(new Vector2(x, y), new Vector2(width, height), videoTarget, muted, true, true, hires, 1f, 1f, false, null, 0, 0, level.LevelOffset);
         level.Add(vidPlayerEntity);
         return new LuaHandle(vidPlayerEntity);
     }
@@ -198,7 +215,7 @@ public class VidPlayerEntityLua {
             Logger.Error(nameof(VidPlayer), "Tried to spawn video player on non-level scene!");
             return null!;
         }
-        VidPlayerEntity vidPlayerEntity = new(new Vector2(x, y), new Vector2(width, height), videoTarget, muted, keepAspectRatio, looping, hires, volumeMult, 1f, false, level.LevelOffset);
+        VidPlayerEntity vidPlayerEntity = new(new Vector2(x, y), new Vector2(width, height), videoTarget, muted, keepAspectRatio, looping, hires, volumeMult, 1f, false, null, 0, 0, level.LevelOffset);
         level.Add(vidPlayerEntity);
 
         return new LuaHandle(vidPlayerEntity);

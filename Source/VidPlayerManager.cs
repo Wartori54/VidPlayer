@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
 using VideoPlayer = Celeste.Mod.VidPlayer.FNA_Reimpl.VideoPlayer2;
 using Monocle;
@@ -46,6 +47,8 @@ public static class VidPlayerManager {
         public readonly VideoPlayer videoPlayer;
         public readonly Video video;
         public readonly ModAsset asset;
+        public VirtualRenderTarget? tempRenderTarget;
+        public SpriteBatch? tempSpriteBatch;
         public readonly string usedHandle;
         private bool marked;
         internal bool Marked => marked;
@@ -77,6 +80,8 @@ public static class VidPlayerManager {
         
         public void Dispose() {
             videoPlayer.Dispose();
+            tempRenderTarget?.Dispose();
+            tempSpriteBatch?.Dispose();
             GC.SuppressFinalize(this);
         }
 

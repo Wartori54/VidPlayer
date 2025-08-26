@@ -18,15 +18,24 @@ public sealed class VidPlayerStyleground : Backdrop {
 
     private void Load() {
         core?.Mark();
-        core = new VidPlayerStylegroundCore(this,
-            data.Attr("video"),
-            data.AttrBool("muted", true),
+        Color? chromaKey = null;
+        string stringChromaKey = data.Attr("chromaKey", "");
+        if (!string.IsNullOrEmpty(stringChromaKey)) {
+            chromaKey = Calc.HexToColor(stringChromaKey);
+        }
+        VidPlayerCore.CoreConfig config = new(Vector2.Zero, data.AttrBool("muted", true),
             data.AttrBool("keepAspectRatio", true),
             true /* always looping */,
             false /* TODO: hires stylegrounds */,
             data.AttrFloat("volumeMult", 1),
             data.AttrFloat("globalAlpha"),
-            data.AttrBool("centered", false));
+            data.AttrBool("centered", false),
+            chromaKey,
+            data.AttrFloat("entityChromaKeyTolAbs"), 
+            data.AttrFloat("entityChromaKeyTolRel"));
+        core = new VidPlayerStylegroundCore(this,
+            data.Attr("video"),
+            config);
         core.Init();
     }
 
@@ -60,8 +69,8 @@ public sealed class VidPlayerStyleground : Backdrop {
     private class VidPlayerStylegroundCore : VidPlayerCore {
         private readonly VidPlayerStyleground owner;
         
-        public VidPlayerStylegroundCore(VidPlayerStyleground owner, string videoTarget, bool entityIsMuted, bool entityKeepAspectRatio, bool entityLooping, bool entityHires, float entityVolumeMult, float entityGlobalAlpha, bool centered) 
-            : base(Vector2.Zero, videoTarget, entityIsMuted, entityKeepAspectRatio, entityLooping, entityHires, entityVolumeMult, entityGlobalAlpha, centered) {
+        public VidPlayerStylegroundCore(VidPlayerStyleground owner, string videoTarget, CoreConfig config) 
+            : base(videoTarget, config) {
             this.owner = owner;
         }
 

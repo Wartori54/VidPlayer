@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,37 +11,76 @@ using Monocle;
 namespace Celeste.Mod.VidPlayer;
 
 public abstract class VidPlayerCore {
-    private readonly Vector2 fixedEntitySize;
-    private bool muted;
-    private readonly bool keepAspectRatio;
-    private readonly bool looping;
-    private bool hires;
-    private float volumeMult;
-    private float globalAlpha;
-    private readonly MTexture fallback;
-    private VidPlayerManager.VidPlayerEntry? vidEntry;
-    private bool hasWoken = false;
-    private readonly bool centered;
+    private static Effect? _chromaKeyShader = null;
+    private static Effect ChromaKeyShader {
+        get {
+            if (_chromaKeyShader != null) return _chromaKeyShader;
+
+            if (Engine.Graphics == null || Engine.Graphics.GraphicsDevice == null) {
+                throw new InvalidOperationException("Tried to obtain the chromaKeyShader too early!");
+            }
+
+            if (!Everest.Content.TryGet("Effects/ChromaKey.cso", out ModAsset chromaKeyAsset)) {
+                throw new InvalidOperationException("No ChromaKey.cso file found!");
+            }
+            
+            return _chromaKeyShader = new Effect(Engine.Graphics.GraphicsDevice, chromaKeyAsset.Data);
+        }
+    }
+
+
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public struct CoreConfig {
+        public readonly Vector2 fixedEntitySize;
+        public bool muted;
+        public readonly bool keepAspectRatio;
+        public readonly bool looping;
+        public bool hires;
+        public float volumeMult;
+        public float globalAlpha;
+        public readonly bool centered;
+        public readonly Color? chromaKey;
+        public readonly float chromaTolAbs;
+        public readonly float chromaTolRes;
+        public CoreConfig(Vector2 fixedEntitySize, bool muted, bool keepAspectRatio, bool looping, bool hires, float volumeMult, float globalAlpha, bool centered, Color? chromaKey, float chromaTolAbs, float chromaTolRes) {
+            this.fixedEntitySize = fixedEntitySize;
+            this.muted = muted;
+            this.keepAspectRatio = keepAspectRatio;
+            this.looping = looping;
+            this.hires = hires;
+            this.volumeMult = volumeMult;
+            this.globalAlpha = globalAlpha;
+            this.centered = centered;
+            this.chromaKey = chromaKey;
+            this.chromaTolAbs = chromaTolAbs;
+            this.chromaTolRes = chromaTolRes;
+        }
+    }
     
+    private bool hasWoken = false;
+    private VidPlayerManager.VidPlayerEntry? vidEntry;
+    private readonly MTexture fallback;
+    private CoreConfig config;
+
     // For handyness
     internal VideoPlayer? videoPlayer => vidEntry?.videoPlayer;
     private float CurrScaleFactor => 6 * (CurrentLevel?.Zoom ?? 1);
-    public bool Hires => hires;
+    public bool Hires => config.hires;
     
     public bool Done => vidEntry == null || hasWoken && (videoPlayer?.State ?? (MediaState)(-1)) == MediaState.Stopped;
     public bool Muted {
-        get => muted;
-        set => muted = value;
+        get => config.muted;
+        set => config.muted = value;
     }
 
     public float VolumeMult {
-        get => volumeMult;
-        set => volumeMult = value;
+        get => config.volumeMult;
+        set => config.volumeMult = value;
     }
 
     public float GlobalAlpha {
-        get => globalAlpha;
-        set => globalAlpha = value;
+        get => config.globalAlpha;
+        set => config.globalAlpha = value;
     }
     
     protected abstract bool Paused { get; }
@@ -49,24 +89,8 @@ public abstract class VidPlayerCore {
     
     protected abstract Level? CurrentLevel { get; }
 
-    protected VidPlayerCore(Vector2 entitySize, 
-        string videoTarget, 
-        bool entityIsMuted, 
-        bool entityKeepAspectRatio, 
-        bool entityLooping, 
-        bool entityHires, 
-        float entityVolumeMult,
-        float entityGlobalAlpha,
-        bool centeredKeepRatio) {
-        
-        fixedEntitySize = entitySize;
-        muted = entityIsMuted;
-        keepAspectRatio = entityKeepAspectRatio;
-        looping = entityLooping;
-        hires = entityHires;
-        volumeMult = entityVolumeMult;
-        globalAlpha = entityGlobalAlpha;
-        centered = centeredKeepRatio;
+    protected VidPlayerCore(string videoTarget, CoreConfig entityConfig) {
+        config = entityConfig;
 
         // Switch to this once it hits main
         // if (SRTModImports.IgnoreSaveState is { } cb) {
@@ -79,15 +103,15 @@ public abstract class VidPlayerCore {
             vidEntry = VidPlayerManager.GetPlayerFor(videoTarget);
         } catch (FileNotFoundException fex) {
             Logger.LogDetailed(fex);
-            hires = false;
+            config.hires = false;
         }
     }
 
     public void Init() {
         if (CheckDisposed()) return;
         videoPlayer!.Stop();
-        videoPlayer!.IsLooped = looping;
-        videoPlayer.IsMuted = muted;
+        videoPlayer!.IsLooped = config.looping;
+        videoPlayer.IsMuted = config.muted;
         videoPlayer.Volume = 0; // Audio volume will be determined on first update instead
         videoPlayer.Play(vidEntry!.video, vidEntry.usedHandle);
         videoPlayer.Pause();
@@ -96,7 +120,7 @@ public abstract class VidPlayerCore {
 
     public void Update() {
         if (CheckDisposed()) return;
-        float normVolume = Settings.Instance.MusicVolume / 10f /* Max volume */ * volumeMult;
+        float normVolume = Settings.Instance.MusicVolume / 10f /* Max volume */ * config.volumeMult;
         normVolume = Math.Clamp(normVolume, 0f, 1f);
         // ReSharper disable once CompareOfFloatsByEqualityOperator
         if (normVolume != videoPlayer!.Volume)
@@ -110,14 +134,14 @@ public abstract class VidPlayerCore {
 
     public void Render() {
         Vector2 size = GetEntitySize();
-        float scalingFactor = hires ? CurrScaleFactor : 1;
+        float scalingFactor = config.hires ? CurrScaleFactor : 1;
         if (CheckDisposed()) {
-            fallback.Draw(Position * scalingFactor, Vector2.Zero, Color.White * globalAlpha, MathF.Min(size.X / fallback.Width, size.Y / fallback.Height) * scalingFactor);
+            fallback.Draw(Position * scalingFactor, Vector2.Zero, Color.White * config.globalAlpha, MathF.Min(size.X / fallback.Width, size.Y / fallback.Height) * scalingFactor);
             return;
         }
         Texture2D currTexture = videoPlayer!.GetTexture();
         Rectangle dstRect;
-        if (!keepAspectRatio) {
+        if (!config.keepAspectRatio) {
             dstRect = new Rectangle((int)(Position.X * scalingFactor), (int)(Position.Y * scalingFactor), (int)(size.X * scalingFactor), (int)(size.Y * scalingFactor));
         } else {
             float ratio = vidEntry!.video.Width / (float)vidEntry.video.Height;
@@ -128,24 +152,50 @@ public abstract class VidPlayerCore {
             if (size.X / size.Y > ratio) {
                 finalSizeX = size.Y * ratio;
                 finalSizeY = size.Y;
-                if (centered)
+                if (config.centered)
                     finalPosX = Position.X + size.X/2 - finalSizeX/2;
             } else {
                 finalSizeX = size.X;
                 finalSizeY = size.X / ratio;
-                if (centered)
+                if (config.centered)
                     finalPosY = Position.Y + size.Y/2 - finalSizeY/2;
             }
             dstRect = new Rectangle((int)(finalPosX * scalingFactor), (int)(finalPosY * scalingFactor), (int)(finalSizeX * scalingFactor), (int)(finalSizeY * scalingFactor));
         }
-        Draw.SpriteBatch.Draw(currTexture, dstRect, Color.White * globalAlpha);
+        if (config.chromaKey == null) {
+            Draw.SpriteBatch.Draw(currTexture, dstRect, Color.White * config.globalAlpha);
+            return;
+        }
+        
+        
+        vidEntry!.tempRenderTarget ??= VirtualContent.CreateRenderTarget(nameof(vidEntry.tempRenderTarget), currTexture.Width, currTexture.Height);
+        vidEntry.tempSpriteBatch ??= new SpriteBatch(Engine.Graphics.GraphicsDevice);
+        RenderTargetBinding[]? origRTs = Engine.Graphics.GraphicsDevice.GetRenderTargets();
+        Engine.Instance.GraphicsDevice.SetRenderTarget(vidEntry.tempRenderTarget);
+        Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
+        ChromaKeyShader.Parameters["s0"].SetValue(currTexture);
+        ChromaKeyShader.Parameters["key"].SetValue(new Vector4() {
+            X = config.chromaKey.Value.R/255f,
+            Y = config.chromaKey.Value.G/255f,
+            Z = config.chromaKey.Value.B/255f,
+            W = 1f
+        });
+        ChromaKeyShader.Parameters["tolabs"].SetValue(config.chromaTolAbs);
+        ChromaKeyShader.Parameters["tolres"].SetValue(config.chromaTolRes);
+        vidEntry.tempSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, ChromaKeyShader);
+        vidEntry.tempSpriteBatch.Draw(currTexture, Vector2.Zero, Color.White);
+        vidEntry.tempSpriteBatch.End(); // Technically useless but oh well
+        Engine.Graphics.GraphicsDevice.SetRenderTargets(origRTs);
+        
+        Draw.SpriteBatch.Draw(vidEntry.tempRenderTarget, dstRect, Color.White * config.globalAlpha);
+        
     }
 
     public bool CheckDisposed() {
         if (vidEntry == null) return true;
         if (vidEntry.videoPlayer.IsDisposed) {
             vidEntry = null;
-            hires = false;
+            config.hires = false;
             return true;
         }
         return false;
@@ -164,7 +214,7 @@ public abstract class VidPlayerCore {
     }
 
     protected virtual Vector2 GetEntitySize() {
-        return fixedEntitySize;
+        return config.fixedEntitySize;
     }
     
     protected virtual void SaveState(Level newLevel) {
