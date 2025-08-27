@@ -3,9 +3,13 @@ sampler s0sampler = sampler_state {
     Texture = s0;
 };
 
+// This shader is mostly based on https://github.com/obsproject/obs-studio/blob/master/plugins/obs-filters/data/chroma_key_filter_v2.effect
+// from the obs project
+
 float4 key;
-float tolabs;
-float tolres;
+float base_thr;
+float alpha_correction;
+float spill;
 
 float3 rgb2ycbcr(float3 rgb) {
     // from https://web.archive.org/web/20160304062915/http://www.equasys.de/colorconversion.html
@@ -21,23 +25,24 @@ float3 rgb2ycbcr(float3 rgb) {
 }
 
 float key_dist(float3 pix) {
+    // Chroma distance (ignore luminosity)
     float3 key_tr = rgb2ycbcr(key.rgb);
     return sqrt((pix.y - key_tr.y) * (pix.y - key_tr.y) + (pix.z - key_tr.z) * (pix.z - key_tr.z));
 }
 
 float4 pixel_shader(float2 tex : TEXCOORD0) : SV_Target0 {
-    float4 rgba;
-    rgba = tex2D(s0sampler, tex);
+    float4 rgba = tex2D(s0sampler, tex);
     float3 ycbcr = rgb2ycbcr(rgba.rgb);
     float d = key_dist(ycbcr);
-    if (d < tolabs) {
-        rgba.rgba = float4(0, 0, 0, 0);
-    } else if (d < tolres) {
-        float mask = (d-tolabs) / (tolres-tolabs);
-        rgba.rgb -= key.rgb*(1-mask);
-        rgba.a = mask;
-    }
-    
+    float base_mask = d - base_thr;
+    float full_mask = pow(saturate(base_mask/alpha_correction), 1.5);
+    float spill_val = pow(saturate(base_mask/spill), 1.5);
+    rgba.a *= full_mask;
+
+    float desat = dot(rgba.rgb, float3(0.2126, 0.7152, 0.0722));
+    rgba.rgb = lerp(float3(desat, desat, desat), rgba.rgb, spill_val);
+
+    rgba.rgb *= rgba.a; // Make sure to premultiply
     return rgba;
 }
 

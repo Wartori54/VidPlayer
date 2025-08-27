@@ -81,7 +81,7 @@ public class VidPlayerModule : EverestModule {
         orig(self, from, to);
     }
     
-    private void CheckFNAVersion() {
+    private static void CheckFNAVersion() {
         Version? fnaVersion = typeof(Game).Assembly.GetName().Version;
         if (fnaVersion == null) {
             Logger.Log(LogLevel.Error, nameof(VidPlayer), "Version-less FNA?");

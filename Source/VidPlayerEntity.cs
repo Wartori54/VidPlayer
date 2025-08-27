@@ -44,8 +44,9 @@ public sealed class VidPlayerEntity : Entity {
             data.Float("globalAlpha"),
             data.Bool("centered"),
             data.Has("chromaKey") && !string.IsNullOrEmpty(data.Attr("chromaKey")) ? data.HexColor("chromaKey") : null,
-            data.Float("entityChromaKeyTolAbs"),
-            data.Float("entityChromaKeyTolRel"),
+            data.Float("chromaKeyBaseThr"),
+            data.Float("chromaKeyAlphaCorr"),
+            data.Float("chromaKeySpill"),
             offset) {
     }
 
@@ -58,10 +59,11 @@ public sealed class VidPlayerEntity : Entity {
         bool entityHires,
         float entityVolumeMult,
         float entityGlobalAlpha,
-        bool centered,
+        bool entityCentered,
         Color? entityChromaKey,
-        float entityChromaKeyTolAbs,
-        float entityChromaKeyTolRel,
+        float entityChromaKeyBaseThr,
+        float entityChromaKeyAlphaCorr,
+        float entityChromaKeySpill,
         Vector2 offset) : base(position + offset) {
         VidPlayerCore.CoreConfig config = new(entitySize,
             entityIsMuted,
@@ -70,10 +72,11 @@ public sealed class VidPlayerEntity : Entity {
             entityHires,
             entityVolumeMult,
             entityGlobalAlpha,
-            centered,
+            entityCentered,
             entityChromaKey,
-            entityChromaKeyTolAbs,
-            entityChromaKeyTolRel);
+            entityChromaKeyBaseThr,
+            entityChromaKeyAlphaCorr,
+            entityChromaKeySpill);
         core = new VidPlayerCoreEntity(this, videoTarget, config);
         Tag = Tags.PauseUpdate | Tags.TransitionUpdate;
         Depth = Depths.Top;
@@ -154,7 +157,7 @@ public class VidPlayerEntityLua {
             Logger.Error(nameof(VidPlayer), "Tried to spawn video player on non-level scene!");
             return null!;
         }
-        VidPlayerEntity vidPlayerEntity = new(new Vector2(x, y), new Vector2(width, height), videoTarget, muted, true, true, hires, 1f, 1f, false, null, 0, 0, level.LevelOffset);
+        VidPlayerEntity vidPlayerEntity = new(new Vector2(x, y), new Vector2(width, height), videoTarget, muted, true, true, hires, 1f, 1f, false, null, 0, 0, 0, level.LevelOffset);
         level.Add(vidPlayerEntity);
         return new LuaHandle(vidPlayerEntity);
     }
@@ -215,7 +218,7 @@ public class VidPlayerEntityLua {
             Logger.Error(nameof(VidPlayer), "Tried to spawn video player on non-level scene!");
             return null!;
         }
-        VidPlayerEntity vidPlayerEntity = new(new Vector2(x, y), new Vector2(width, height), videoTarget, muted, keepAspectRatio, looping, hires, volumeMult, 1f, false, null, 0, 0, level.LevelOffset);
+        VidPlayerEntity vidPlayerEntity = new(new Vector2(x, y), new Vector2(width, height), videoTarget, muted, keepAspectRatio, looping, hires, volumeMult, 1f, false, null, 0, 0, 0, level.LevelOffset);
         level.Add(vidPlayerEntity);
 
         return new LuaHandle(vidPlayerEntity);

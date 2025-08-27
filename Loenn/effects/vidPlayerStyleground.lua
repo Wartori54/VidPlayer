@@ -12,8 +12,9 @@ vidPlayerStyleground.defaultData = {
     globalAlpha = 1,
     centered = false,
     chromaKey = "",
-    entityChromaKeyTolAbs = 0,
-    entityChromaKeyTolRel = 0,
+    chromaKeyBaseThr = 0,
+    chromaKeyAlphaCorr = 0.1,
+    chromaKeySpill = 0.1,
 }
 
 vidPlayerStyleground.fieldInformation = {
@@ -30,12 +31,17 @@ vidPlayerStyleground.fieldInformation = {
         fieldType = "color",
         allowEmpty = true,
     },
-    entityChromaKeyTolAbs = {
-        fieldType = "number"
+    chromaKeyBaseThr = {
+        fieldType = "number",
     },
-    entityChromaKeyTolRel = {
-        fieldType = "number"
-    }
+    chromaKeyAlphaCorr = {
+        fieldType = "number",
+        minimumValue = 0.000001, -- epsilon
+    },
+    chromaKeySpill = {
+        fieldType = "number",
+        minimumValue = 0.000001, -- epsilon
+    },
 }
 
 return vidPlayerStyleground

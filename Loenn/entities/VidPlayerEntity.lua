@@ -21,8 +21,9 @@ vidPlayerEntity.placements = {
         globalAlpha = 1,
         centered = false,
         chromaKey = "",
-        entityChromaKeyTolAbs = 0,
-        entityChromaKeyTolRel = 0,
+        chromaKeyBaseThr = 0.1,
+        chromaKeyAlphaCorr = 0.1,
+        chromaKeySpill = 0.1,
     }
 }
 vidPlayerEntity.fieldInformation = {
@@ -39,12 +40,17 @@ vidPlayerEntity.fieldInformation = {
         fieldType = "color",
         allowEmpty = true,
     },
-    entityChromaKeyTolAbs = {
-        fieldType = "number"
+    chromaKeyBaseThr = {
+        fieldType = "number",
     },
-    entityChromaKeyTolRel = {
-        fieldType = "number"
-    }
+    chromaKeyAlphaCorr = {
+        fieldType = "number",
+        minimumValue = 0.000001, -- epsilon
+    },
+    chromaKeySpill = {
+        fieldType = "number",
+        minimumValue = 0.000001, -- epsilon
+    },
 }
 
 function vidPlayerEntity.sprite(room, entity)

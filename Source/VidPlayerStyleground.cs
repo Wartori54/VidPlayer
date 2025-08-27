@@ -31,8 +31,9 @@ public sealed class VidPlayerStyleground : Backdrop {
             data.AttrFloat("globalAlpha"),
             data.AttrBool("centered", false),
             chromaKey,
-            data.AttrFloat("entityChromaKeyTolAbs"), 
-            data.AttrFloat("entityChromaKeyTolRel"));
+            data.AttrFloat("chromaKeyBaseThr"), 
+            data.AttrFloat("chromaKeyAlphaCorr"),
+            data.AttrFloat("chromaKeySpill"));
         core = new VidPlayerStylegroundCore(this,
             data.Attr("video"),
             config);

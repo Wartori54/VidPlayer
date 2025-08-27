@@ -9,6 +9,13 @@ entities.VidPlayer/VidPlayerEntity.attributes.description.hires=When false the v
 entities.VidPlayer/VidPlayerEntity.attributes.description.volumeMult=Multiplier of the volume.
 entities.VidPlayer/VidPlayerEntity.attributes.description.globalAlpha=Determines the Alpha value for the entire player (0 is fully transparent, 1 is fully opaque).
 entities.VidPlayer/VidPlayerEntity.attributes.description.centered=Centers the video when keepAspectRatio is true.
+entities.VidPlayer/VidPlayerEntity.attributes.description.chromaKey=Chroma Key color, leave empty to disable,
+entities.VidPlayer/VidPlayerEntity.attributes.name.chromaKeyBaseThr=Chroma Key Base Threshold
+entities.VidPlayer/VidPlayerEntity.attributes.description.chromaKeyBaseThr=Base threshold for Chroma Key, pixels below this threshold will be completely removed.
+entities.VidPlayer/VidPlayerEntity.attributes.name.chromaKeyAlphaCorr=Chroma Key Alpha Correction
+entities.VidPlayer/VidPlayerEntity.attributes.description.chromaKeyAlphaCorr=Alpha correction threshold, pixels below this threshold (starting from the Base threshold) will become proportionally transparent.
+entities.VidPlayer/VidPlayerEntity.attributes.name.chromaKeySpill=Chroma Key Spill
+entities.VidPlayer/VidPlayerEntity.attributes.description.chromaKeySpill=Color desaturation threshold, pixels below this threshold (starting from the Base threshold) will be proportionally desaturated.
 
 triggers.VidPlayer/VidPlayerStylegroundReset.placements.name.vidPlayerStylegroundReset=In-Game Video Styleground Reset
 triggers.VidPlayer/VidPlayerStylegroundReset.attributes.description.tag=Stylegrounds with this tag will be reset.
@@ -19,4 +26,11 @@ style.effects.VidPlayer/VidPlayerStyleground.description.muted=Whether the video
 style.effects.VidPlayer/VidPlayerStyleground.description.keepAspectRatio=If true the video won't stretch to fit the given target dimensions.
 style.effects.VidPlayer/VidPlayerStyleground.description.volumeMult=Multiplier of the volume.
 style.effects.VidPlayer/VidPlayerStyleground.description.centered=Centers the video when keepAspectRatio is true.
+style.effects.VidPlayer/VidPlayerStyleground.description.chromaKey=Chroma Key color, leave empty to disable.
+style.effects.VidPlayer/VidPlayerStyleground.attribute.chromaKeyBaseThr=Chroma Key Base Threshold
+style.effects.VidPlayer/VidPlayerStyleground.description.chromaKeyBaseThr=Base threshold for Chroma Key, pixels below this threshold will be completely removed.
+style.effects.VidPlayer/VidPlayerStyleground.attribute.chromaKeyAlphaCorr=Chroma Key Alpha Correction
+style.effects.VidPlayer/VidPlayerStyleground.description.chromaKeyAlphaCorr=Alpha correction threshold, pixels below this threshold (starting from the Base threshold) will become proportionally transparent.
+style.effects.VidPlayer/VidPlayerStyleground.attribute.chromaKeySpill=Chroma Key Spill
+style.effects.VidPlayer/VidPlayerStyleground.description.chromaKeySpill=Color desaturation threshold, pixels below this threshold (starting from the Base threshold) will be proportionally desaturated.
 

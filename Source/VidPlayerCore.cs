@@ -40,9 +40,11 @@ public abstract class VidPlayerCore {
         public float globalAlpha;
         public readonly bool centered;
         public readonly Color? chromaKey;
-        public readonly float chromaTolAbs;
-        public readonly float chromaTolRes;
-        public CoreConfig(Vector2 fixedEntitySize, bool muted, bool keepAspectRatio, bool looping, bool hires, float volumeMult, float globalAlpha, bool centered, Color? chromaKey, float chromaTolAbs, float chromaTolRes) {
+        public readonly float chromaBaseThr;
+        public readonly float chromaAlphaCorr;
+        public readonly float chromaSpill;
+        
+        public CoreConfig(Vector2 fixedEntitySize, bool muted, bool keepAspectRatio, bool looping, bool hires, float volumeMult, float globalAlpha, bool centered, Color? chromaKey, float chromaBaseThr, float chromaAlphaCorr, float chromaSpill) {
             this.fixedEntitySize = fixedEntitySize;
             this.muted = muted;
             this.keepAspectRatio = keepAspectRatio;
@@ -52,8 +54,9 @@ public abstract class VidPlayerCore {
             this.globalAlpha = globalAlpha;
             this.centered = centered;
             this.chromaKey = chromaKey;
-            this.chromaTolAbs = chromaTolAbs;
-            this.chromaTolRes = chromaTolRes;
+            this.chromaBaseThr = chromaBaseThr;
+            this.chromaAlphaCorr = chromaAlphaCorr;
+            this.chromaSpill = chromaSpill;
         }
     }
     
@@ -180,8 +183,9 @@ public abstract class VidPlayerCore {
             Z = config.chromaKey.Value.B/255f,
             W = 1f
         });
-        ChromaKeyShader.Parameters["tolabs"].SetValue(config.chromaTolAbs);
-        ChromaKeyShader.Parameters["tolres"].SetValue(config.chromaTolRes);
+        ChromaKeyShader.Parameters["base_thr"].SetValue(config.chromaBaseThr);
+        ChromaKeyShader.Parameters["alpha_correction"].SetValue(config.chromaAlphaCorr);
+        ChromaKeyShader.Parameters["spill"].SetValue(config.chromaSpill);
         vidEntry.tempSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, ChromaKeyShader);
         vidEntry.tempSpriteBatch.Draw(currTexture, Vector2.Zero, Color.White);
         vidEntry.tempSpriteBatch.End(); // Technically useless but oh well
