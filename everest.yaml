@@ -1,5 +1,5 @@
 - Name: VidPlayer
-  Version: 0.2.1
+  Version: 0.3.0
   DLL: bin/VidPlayer.dll
   Dependencies:
     - Name: EverestCore
