@@ -44,3 +44,4 @@ jobs:
             Dialog/**/*
             Graphics/**/*
             Loenn/**/*
+            Effects/*.cso
