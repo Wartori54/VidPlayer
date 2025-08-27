@@ -51,7 +51,7 @@ public sealed class VidPlayerStyleground : Backdrop {
     }
 
     private void ConsistentUpdate(Scene scene) {
-        if (core?.CheckDisposed() ?? true) { // Try to revive it
+        if (core?.CanBeRevived() ?? true) { // Try to revive it
             Load();
         }
         core?.Update();

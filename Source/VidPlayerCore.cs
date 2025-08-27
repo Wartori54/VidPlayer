@@ -64,6 +64,7 @@ public abstract class VidPlayerCore {
     private VidPlayerManager.VidPlayerEntry? vidEntry;
     private readonly MTexture fallback;
     private CoreConfig config;
+    private readonly bool loadingFailure;
 
     // For handyness
     internal VideoPlayer? videoPlayer => vidEntry?.videoPlayer;
@@ -107,6 +108,7 @@ public abstract class VidPlayerCore {
         } catch (FileNotFoundException fex) {
             Logger.LogDetailed(fex);
             config.hires = false;
+            loadingFailure = true;
         }
     }
 
@@ -193,6 +195,10 @@ public abstract class VidPlayerCore {
         
         Draw.SpriteBatch.Draw(vidEntry.tempRenderTarget, dstRect, Color.White * config.globalAlpha);
         
+    }
+
+    public bool CanBeRevived() {
+        return !loadingFailure && CheckDisposed();
     }
 
     public bool CheckDisposed() {
