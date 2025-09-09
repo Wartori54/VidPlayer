@@ -1,6 +1,11 @@
 using Celeste.Mod.Backdrops;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Mono.Cecil.Cil;
 using Monocle;
+using MonoMod;
+using MonoMod.Cil;
+using System;
 
 namespace Celeste.Mod.VidPlayer;
 
@@ -11,10 +16,78 @@ public sealed class VidPlayerStyleground : Backdrop {
     
     private Scene? currentScene;
     private readonly BinaryPacker.Element data;
-    
+    private static VirtualRenderTarget? tempHiresRenderTarget;
+
     public VidPlayerStyleground(BinaryPacker.Element data) {
         this.data = data;
     }
+
+    // hi-res hook stuff
+    // thank you maddie's helping hand HD parallax
+    public static void LoadHooks() {
+        IL.Celeste.Level.Render += onLevelRender;
+    }
+
+    public static void UnloadHooks() {
+        IL.Celeste.Level.Render -= onLevelRender;
+    }
+
+    private static void onLevelRender(ILContext il) {
+        ILCursor cursor = new ILCursor(il);
+
+        // all of this manipulation and the temp rendertarget is needed cause swapping rendertargets clears the backbuffer
+        if (cursor.TryGotoNext(instr => instr.MatchLdnull(), instr => instr.MatchCallvirt<GraphicsDevice>("SetRenderTarget"))
+            && cursor.TryGotoNext(MoveType.Before, instr => instr.MatchCallvirt<SpriteBatch>("Begin"))) {
+            cursor.EmitDelegate<Action>(() => {
+                tempHiresRenderTarget ??= VirtualContent.CreateRenderTarget(nameof(tempHiresRenderTarget), Celeste.TargetWidth, Celeste.TargetHeight);
+                Engine.Instance.GraphicsDevice.SetRenderTarget(tempHiresRenderTarget);
+            });
+
+            if (cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<SpriteBatch>("Begin"))) {
+                cursor.EmitDelegate<Action>(() => renderIfHires(fg: false));
+            }
+
+            if (cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<SpriteBatch>("End"))) {
+                cursor.EmitDelegate<Action>(() => {
+                    renderIfHires(fg: true);
+                    Engine.Instance.GraphicsDevice.SetRenderTarget(null);
+                    Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null);
+                    Draw.SpriteBatch.Draw((RenderTarget2D)tempHiresRenderTarget, Vector2.Zero, Color.White);
+                    Draw.SpriteBatch.End();
+                });
+            }
+        }
+    }
+
+    private static void renderIfHires(bool fg) {
+        if (Engine.Scene is Level level) {
+            foreach (Backdrop backdrop in (fg ? level.Foreground.Backdrops : level.Background.Backdrops)) {
+                if (backdrop is VidPlayerStyleground && ((backdrop as VidPlayerStyleground).core?.Hires ?? false)) {
+                    Color old = level.BackgroundColor;
+                    level.BackgroundColor = Color.Transparent;
+                    renderHires((backdrop as VidPlayerStyleground));
+                    level.BackgroundColor = old;
+                }
+            }
+        }
+    }
+
+    private static void renderHires(VidPlayerStyleground styleground) {
+        if (!styleground.Visible) {
+            return;
+        }
+
+        Matrix matrix = Engine.ScreenMatrix;
+        if (SaveData.Instance.Assists.MirrorMode) {
+            matrix *= Matrix.CreateTranslation(-Engine.Viewport.Width, 0f, 0f);
+            matrix *= Matrix.CreateScale(-1f, 1f, 1f);
+        }
+
+        Draw.SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, matrix);
+        styleground.core?.Render();
+        Draw.SpriteBatch.End();
+    }
+    // end of hi-res stuff
 
     private void Load() {
         core?.Mark();
@@ -26,7 +99,7 @@ public sealed class VidPlayerStyleground : Backdrop {
         VidPlayerCore.CoreConfig config = new(Vector2.Zero, data.AttrBool("muted", true),
             data.AttrBool("keepAspectRatio", true),
             true /* always looping */,
-            false /* TODO: hires stylegrounds */,
+            data.AttrBool("hires", false),
             data.AttrFloat("volumeMult", 1),
             data.AttrFloat("globalAlpha"),
             data.AttrBool("centered", false),
@@ -58,12 +131,16 @@ public sealed class VidPlayerStyleground : Backdrop {
     }
 
     public override void Render(Scene scene) {
-        base.Render(scene);
-        core?.Render();
+        if (!(core?.Hires ?? false)) {
+            base.Render(scene);
+            core?.Render();
+        }
     }
 
     public override void Ended(Scene scene) {
         base.Ended(scene);
+        tempHiresRenderTarget?.Dispose();
+        tempHiresRenderTarget = null;
         core?.Mark();
     }
 
