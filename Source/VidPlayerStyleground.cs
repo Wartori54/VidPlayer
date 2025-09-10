@@ -41,6 +41,7 @@ public sealed class VidPlayerStyleground : Backdrop {
             cursor.EmitDelegate<Action>(() => {
                 tempHiresRenderTarget ??= VirtualContent.CreateRenderTarget(nameof(tempHiresRenderTarget), Celeste.TargetWidth, Celeste.TargetHeight);
                 Engine.Instance.GraphicsDevice.SetRenderTarget(tempHiresRenderTarget);
+                Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
             });
 
             if (cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<SpriteBatch>("Begin"))) {

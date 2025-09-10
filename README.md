@@ -35,8 +35,8 @@ See [here](Docs/api/Celeste.Mod.VidPlayer.VidPlayerEntityLua.md)
 for the full documentation.
 
 ### As a styleground
-You can also set it as a styleground in loenn, hires will be forcefully disabled for now and looping enabled.
-Its recommended that your video's resolutions is already 320x180 to prevent downscaling artifacts.
+You can also set it as a styleground in loenn, looping is forcefully enabled.
+It's recommended that your video's resolution is already 320x180 (or 1920x1080 for hi-res) to prevent downscaling artifacts.
 
 ## Extra
 Playing the same video file in two players is not supported.
