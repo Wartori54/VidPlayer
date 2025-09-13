@@ -36,7 +36,9 @@ for the full documentation.
 
 ### As a styleground
 You can also set it as a styleground in loenn, looping is forcefully enabled.
+
 It's recommended that your video's resolution is already 320x180 (or 1920x1080 for hi-res) to prevent downscaling artifacts.
+
 Note that hi-res stylegrounds can only be rendered either above everything, including other stylegrounds, or below everything, including other stylegrounds. This is the behavior for foreground and background respectively.
 
 ## Extra
