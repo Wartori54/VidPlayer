@@ -16,14 +16,13 @@ public sealed class VidPlayerStyleground : Backdrop {
     
     private Scene? currentScene;
     private readonly BinaryPacker.Element data;
-    private static VirtualRenderTarget? tempHiresRenderTarget;
+    private static VirtualRenderTarget? tempFGRenderTarget;
 
     public VidPlayerStyleground(BinaryPacker.Element data) {
         this.data = data;
     }
 
-    // hi-res hook stuff
-    // thank you maddie's helping hand HD parallax
+    // hi-res stuff
     public static void LoadHooks() {
         IL.Celeste.Level.Render += onLevelRender;
     }
@@ -35,58 +34,105 @@ public sealed class VidPlayerStyleground : Backdrop {
     private static void onLevelRender(ILContext il) {
         ILCursor cursor = new ILCursor(il);
 
-        // all of this manipulation and the temp rendertarget is needed cause swapping rendertargets clears the backbuffer
-        if (cursor.TryGotoNext(instr => instr.MatchLdnull(), instr => instr.MatchCallvirt<GraphicsDevice>("SetRenderTarget"))
-            && cursor.TryGotoNext(MoveType.Before, instr => instr.MatchCallvirt<SpriteBatch>("Begin"))) {
-            cursor.EmitDelegate<Action>(() => {
-                tempHiresRenderTarget ??= VirtualContent.CreateRenderTarget(nameof(tempHiresRenderTarget), Celeste.TargetWidth, Celeste.TargetHeight);
-                Engine.Instance.GraphicsDevice.SetRenderTarget(tempHiresRenderTarget);
-                Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
-            });
-
-            if (cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<SpriteBatch>("Begin"))) {
-                cursor.EmitDelegate<Action>(() => renderIfHires(fg: false));
-            }
-
-            if (cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<SpriteBatch>("End"))) {
-                cursor.EmitDelegate<Action>(() => {
-                    renderIfHires(fg: true);
-                    Engine.Instance.GraphicsDevice.SetRenderTarget(null);
-                    Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null);
-                    Draw.SpriteBatch.Draw((RenderTarget2D)tempHiresRenderTarget, Vector2.Zero, Color.White);
-                    Draw.SpriteBatch.End();
-                });
-            }
+        // Basically, the contents of the backbuffer are discarded when it is set as the active RenderTarget.
+        // And since the active RenderTarget changes in core.Render() if we're chromakeying, this is an issue for
+        // rendering FG stylegrounds since it'll clear the backbuffer if we're currently drawing there.
+        // I've done some googling on why this happens, and it seems to be unavoidable -- SetRenderTarget(null)
+        // internally binds the swap chain's backbuffer, and its contents are undefined after rebinding.
+        // This *could* be worked around at a lower level, but it's probably going to be extremely messy
+        // and involve digging into DirectX, which is quite a terrible idea.
+        // So my solution is just another RenderTarget.
+        //
+        // (right before SetRenderTarget(null))
+        // Pre-render all FG hi-res stylegrounds into a separate RenderTarget
+        // (after SetRenderTarget(null), Clear())
+        // Render BG hi-res stylegrounds
+        // (Right after End())
+        // Render contents of said separate RenderTarget
+        if (!cursor.TryGotoNext(MoveType.Before, instr => instr.MatchLdnull(), instr => instr.MatchCallvirt<GraphicsDevice>("SetRenderTarget"))) {
+            throw new InvalidOperationException("Cannot find SetRenderTarget(null)!");
         }
+
+        // (right before SetRenderTarget(null))
+        // Pre-render all FG hi-res stylegrounds into a separate RenderTarget
+        cursor.EmitDelegate<Action>(levelRender_prerenderFG);
+
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdnull(),
+                instr => instr.MatchCallvirt<GraphicsDevice>("SetRenderTarget")) ||
+                !cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<GraphicsDevice>("Clear"))) {
+            throw new InvalidOperationException("Cannot find SetRenderTarget(null) and/or Clear()!");
+        }
+
+        // (after SetRenderTarget(null), Clear())
+        // Render BG hi-res stylegrounds
+        cursor.EmitDelegate<Action>(levelRender_renderBG);
+
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<SpriteBatch>("End"))) {
+            throw new InvalidOperationException("Cannot find SpriteBatch.End()!");
+        }
+
+        // (Right after End())
+        // Render contents of said separate RenderTarget
+        cursor.EmitDelegate<Action>(levelRender_renderFGRT);
     }
 
-    private static void renderIfHires(bool fg) {
+    private static void levelRender_prerenderFG() {
+        tempFGRenderTarget ??= VirtualContent.CreateRenderTarget(nameof(tempFGRenderTarget), Celeste.TargetWidth, Celeste.TargetHeight);
+        Engine.Instance.GraphicsDevice.SetRenderTarget(tempFGRenderTarget);
+        Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
+
+        renderHires(fg: true);
+    }
+
+    private static void levelRender_renderBG() {
+        renderHires(fg: false);
+    }
+
+    private static void levelRender_renderFGRT() {
+        Draw.SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, getMatrix());
+        Draw.SpriteBatch.Draw((RenderTarget2D)tempFGRenderTarget, Vector2.Zero, Color.White);
+        Draw.SpriteBatch.End();
+    }
+
+    private static void renderHires(bool fg) {
+        // Note: If there are no VidPlayerStylegrounds, then this Begin/End is pointless... does that even matter?
+        Draw.SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, getMatrix());
         if (Engine.Scene is Level level) {
             foreach (Backdrop backdrop in (fg ? level.Foreground.Backdrops : level.Background.Backdrops)) {
-                if (backdrop is VidPlayerStyleground && ((backdrop as VidPlayerStyleground).core?.Hires ?? false)) {
-                    Color old = level.BackgroundColor;
+                // I haven't ran into issues regarding this, so silence these warnings for now.
+#pragma warning disable CS8602 // Dereference of a possibly null reference
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type
+                if (backdrop != null && backdrop is VidPlayerStyleground && ((backdrop as VidPlayerStyleground).core?.Hires ?? false)) {
+                    // XXX: This is a workaround that Maddie's Helping Hand also does. GameplayBuffers.Level is
+                    // cleared with BackgroundColor before drawing anything -- this means that background hires stylegrounds
+                    // will be completely blocked by the default black color.
+                    // A cleaner solution would probably be to replace the BackgroundColor in the original call to
+                    // Color.Transparent, and then draw the black background later when GameplayBuffers.Level is
+                    // rendered.
+                    //
+                    // The only drawback of this workaround (that I know of) is that, from the player/mapper's perspective,
+                    // the black background of the level will now be unaffected by colorgrading/etc.
                     level.BackgroundColor = Color.Transparent;
-                    renderHires((backdrop as VidPlayerStyleground));
-                    level.BackgroundColor = old;
+
+                    VidPlayerStyleground styleground = (backdrop as VidPlayerStyleground);
+                    if (styleground.Visible) {
+                        styleground.core?.Render();
+                    }
                 }
+#pragma warning restore CS8602
+#pragma warning restore CS8600
             }
         }
+        Draw.SpriteBatch.End();
     }
 
-    private static void renderHires(VidPlayerStyleground styleground) {
-        if (!styleground.Visible) {
-            return;
-        }
-
+    private static Matrix getMatrix() {
         Matrix matrix = Engine.ScreenMatrix;
         if (SaveData.Instance.Assists.MirrorMode) {
             matrix *= Matrix.CreateTranslation(-Engine.Viewport.Width, 0f, 0f);
             matrix *= Matrix.CreateScale(-1f, 1f, 1f);
         }
-
-        Draw.SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, matrix);
-        styleground.core?.Render();
-        Draw.SpriteBatch.End();
+        return matrix;
     }
     // end of hi-res stuff
 
@@ -140,8 +186,8 @@ public sealed class VidPlayerStyleground : Backdrop {
 
     public override void Ended(Scene scene) {
         base.Ended(scene);
-        tempHiresRenderTarget?.Dispose();
-        tempHiresRenderTarget = null;
+        tempFGRenderTarget?.Dispose();
+        tempFGRenderTarget = null;
         core?.Mark();
     }
 
