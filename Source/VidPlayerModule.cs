@@ -44,6 +44,8 @@ public class VidPlayerModule : EverestModule {
         // On.Celeste.Level._GCCollect += LevelOn_GCCollect;
         // IL.Celeste.Level.Reload += ILLevelOnReload;
         On.Monocle.Engine.Update += EngineOnUpdate;
+
+	VidPlayerStyleground.LoadHooks();
     }
     
     private static void EngineOnUpdate(On.Monocle.Engine.orig_Update orig, Engine self, GameTime dt) {
@@ -56,6 +58,8 @@ public class VidPlayerModule : EverestModule {
         // On.Monocle.Engine.OnSceneTransition -= EngineOnOnSceneTransition;
         // On.Celeste.Level._GCCollect -= LevelOn_GCCollect;
         // IL.Celeste.Level.Reload -= ILLevelOnReload;
+
+	VidPlayerStyleground.UnloadHooks();
     }
     
     private static void ILLevelOnReload(ILContext il) {

@@ -24,6 +24,7 @@ style.effects.VidPlayer/VidPlayerStyleground.name=In-Game Video Player
 style.effects.VidPlayer/VidPlayerStyleground.description.video=The OGV video source to play, formated as "ModName:/absolute/path/to/file.ogv".
 style.effects.VidPlayer/VidPlayerStyleground.description.muted=Whether the video's audio plays or not.
 style.effects.VidPlayer/VidPlayerStyleground.description.keepAspectRatio=If true the video won't stretch to fit the given target dimensions.
+style.effects.VidPlayer/VidPlayerStyleground.description.hires=When false the video will be downscaled to pixel-art form.
 style.effects.VidPlayer/VidPlayerStyleground.description.volumeMult=Multiplier of the volume.
 style.effects.VidPlayer/VidPlayerStyleground.description.centered=Centers the video when keepAspectRatio is true.
 style.effects.VidPlayer/VidPlayerStyleground.description.chromaKey=Chroma Key color, leave empty to disable.
