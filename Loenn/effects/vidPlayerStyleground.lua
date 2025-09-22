@@ -11,6 +11,7 @@ vidPlayerStyleground.defaultData = {
     volumeMult = 1,
     globalAlpha = 1,
     centered = false,
+    hires = false,
     chromaKey = "",
     chromaKeyBaseThr = 0,
     chromaKeyAlphaCorr = 0.1,
