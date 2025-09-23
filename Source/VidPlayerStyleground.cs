@@ -22,42 +22,13 @@ public sealed class VidPlayerStyleground : Backdrop {
         UseSpritebatch = false;
     }
 
-    // hi-res stuff
-    public static void LoadHooks() {
-        IL.Celeste.Level.Render += onLevelRender;
-    }
+    internal static void ILLevelRender(ILContext il) {
+        ILCursor cursor = new(il);
 
-    public static void UnloadHooks() {
-        IL.Celeste.Level.Render -= onLevelRender;
-    }
-
-    private static void onLevelRender(ILContext il) {
-        ILCursor cursor = new ILCursor(il);
-
-        // Basically, the contents of the backbuffer are discarded when it is set as the active RenderTarget.
-        // And since the active RenderTarget changes in core.Render() if we're chromakeying, this is an issue for
-        // rendering FG stylegrounds since it'll clear the backbuffer if we're currently drawing there.
-        // I've done some googling on why this happens, and it seems to be unavoidable -- SetRenderTarget(null)
-        // internally binds the swap chain's backbuffer, and its contents are undefined after rebinding.
-        // This *could* be worked around at a lower level, but it's probably going to be extremely messy
-        // and involve digging into DirectX, which is quite a terrible idea.
-        // So my solution is just another RenderTarget.
-        //
-        // (right before SetRenderTarget(null))
-        // Pre-render all FG hi-res stylegrounds into a separate RenderTarget
         // (after SetRenderTarget(null), Clear())
         // Render BG hi-res stylegrounds
         // (Right after End())
-        // Render contents of said separate RenderTarget
-        if (!cursor.TryGotoNext(MoveType.Before, instr => instr.MatchLdnull(), instr => instr.MatchCallvirt<GraphicsDevice>("SetRenderTarget"))) {
-            throw new InvalidOperationException("Cannot find SetRenderTarget(null)!");
-        }
-
-        // (right before SetRenderTarget(null))
-        // Pre-render all FG hi-res stylegrounds into a separate RenderTarget
-        // cursor.EmitDelegate<Action>(levelRender_prerenderFG);
-        cursor.Index--;
-
+        // Render FG hi-res stylegrounds
         if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdnull(),
                 instr => instr.MatchCallvirt<GraphicsDevice>("SetRenderTarget")) ||
                 !cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<GraphicsDevice>("Clear"))) {
@@ -66,7 +37,9 @@ public sealed class VidPlayerStyleground : Backdrop {
 
         // (after SetRenderTarget(null), Clear())
         // Render BG hi-res stylegrounds
-        cursor.EmitDelegate<Action>(levelRender_renderBG);
+        cursor.EmitLdarg0();
+        cursor.EmitLdcI4(0); // emit false
+        cursor.EmitDelegate(RenderHiresVPS);
 
         if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<SpriteBatch>("End"))) {
             throw new InvalidOperationException("Cannot find SpriteBatch.End()!");
@@ -74,51 +47,41 @@ public sealed class VidPlayerStyleground : Backdrop {
 
         // (Right after End())
         // Render contents of said separate RenderTarget
-        // cursor.EmitDelegate<Action>(levelRender_renderFGRT);
-        cursor.EmitDelegate<Action>(levelRender_renderFG);
+        cursor.EmitLdarg0();
+        cursor.EmitLdcI4(1); // emit true
+        cursor.EmitDelegate(RenderHiresVPS);
+        Console.WriteLine(il);
     }
 
-    private static void levelRender_renderBG() {
-        renderHires(fg: false);
-    }
-    
-    private static void levelRender_renderFG() {
-        renderHires(fg: true);
-    }
+    private static void RenderHiresVPS(Level level, bool fg) {
+        bool sbBegin = false;
+        foreach (Backdrop backdrop in fg ? level.Foreground.Backdrops : level.Background.Backdrops) {
+            if (backdrop is not VidPlayerStyleground vps || !(vps.core?.Hires ?? false)) continue;
+            // XXX: This is a workaround that Maddie's Helping Hand also does. GameplayBuffers.Level is
+            // cleared with BackgroundColor before drawing anything -- this means that background hires stylegrounds
+            // will be completely blocked by the default black color.
+            // A cleaner solution would probably be to replace the BackgroundColor in the original call to
+            // Color.Transparent, and then draw the black background later when GameplayBuffers.Level is
+            // rendered.
+            //
+            // The only drawback of this workaround (that I know of) is that, from the player/mapper's perspective,
+            // the black background of the level will now be unaffected by colorgrading/etc.
+            level.BackgroundColor = Color.Transparent;
 
-    private static void renderHires(bool fg) {
-        // Note: If there are no VidPlayerStylegrounds, then this Begin/End is pointless... does that even matter?
-        Draw.SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, getMatrix());
-        if (Engine.Scene is Level level) {
-            foreach (Backdrop backdrop in (fg ? level.Foreground.Backdrops : level.Background.Backdrops)) {
-                // I haven't ran into issues regarding this, so silence these warnings for now.
-#pragma warning disable CS8602 // Dereference of a possibly null reference
-#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type
-                if (backdrop != null && backdrop is VidPlayerStyleground && ((backdrop as VidPlayerStyleground).core?.Hires ?? false)) {
-                    // XXX: This is a workaround that Maddie's Helping Hand also does. GameplayBuffers.Level is
-                    // cleared with BackgroundColor before drawing anything -- this means that background hires stylegrounds
-                    // will be completely blocked by the default black color.
-                    // A cleaner solution would probably be to replace the BackgroundColor in the original call to
-                    // Color.Transparent, and then draw the black background later when GameplayBuffers.Level is
-                    // rendered.
-                    //
-                    // The only drawback of this workaround (that I know of) is that, from the player/mapper's perspective,
-                    // the black background of the level will now be unaffected by colorgrading/etc.
-                    level.BackgroundColor = Color.Transparent;
+            if (!sbBegin) {
+                Draw.SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, GetMatrix());
+                sbBegin = true;
+            }
 
-                    VidPlayerStyleground styleground = (backdrop as VidPlayerStyleground);
-                    if (styleground.Visible) {
-                        styleground.core?.Render();
-                    }
-                }
-#pragma warning restore CS8602
-#pragma warning restore CS8600
+            if (vps.Visible) {
+                vps.core?.Render();
             }
         }
-        Draw.SpriteBatch.End();
+        if (sbBegin)
+            Draw.SpriteBatch.End();
     }
 
-    private static Matrix getMatrix() {
+    private static Matrix GetMatrix() {
         Matrix matrix = Engine.ScreenMatrix;
         if (SaveData.Instance.Assists.MirrorMode) {
             matrix *= Matrix.CreateTranslation(-Engine.Viewport.Width, 0f, 0f);
@@ -126,7 +89,6 @@ public sealed class VidPlayerStyleground : Backdrop {
         }
         return matrix;
     }
-    // end of hi-res stuff
 
     private void Load() {
         core?.Mark();
@@ -204,10 +166,10 @@ public sealed class VidPlayerStyleground : Backdrop {
 
         protected override void RestartSpriteBatch() {
             if (config.hires) {
-                Draw.SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, getMatrix());
+                Draw.SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, GetMatrix());
             } else {
                 // UseSpritebatch is set to false, and Render makes its own one
-                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, getMatrix());
+                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, GetMatrix());
             }
         }
 
