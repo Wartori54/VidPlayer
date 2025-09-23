@@ -139,7 +139,7 @@ public abstract class VidPlayerCore {
 
     public void Render() {
         Vector2 size = GetEntitySize();
-        float scalingFactor = config.hires ? CurrScaleFactor : 1;
+        float scalingFactor = Hires ? CurrScaleFactor : 1;
         if (CheckDisposed()) {
             fallback.Draw(Position * scalingFactor, Vector2.Zero, Color.White * config.globalAlpha, MathF.Min(size.X / fallback.Width, size.Y / fallback.Height) * scalingFactor);
             return;

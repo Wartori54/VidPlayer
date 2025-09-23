@@ -91,8 +91,9 @@ public sealed class VidPlayerEntity : Entity {
 #if DEBUG // Just for quick debug rendering
         Collider = new Hitbox(entitySize.X, entitySize.Y);
 #endif
-        if (core.Hires)
-            Tag |= TagsExt.SubHUD;
+        if (core.Hires) {
+            Tag |= GameplayHudRenderer.GameplayHud;
+        }
     }
 
     public override void Awake(Scene scene) {
@@ -134,19 +135,11 @@ public sealed class VidPlayerEntity : Entity {
         protected override Level? CurrentLevel => owner.SceneAs<Level>();
 
         protected override void RestartSpriteBatch() {
-            if (config.hires) {
-                SubHudRenderer.BeginRender(prevBlendState, prevSamplerState);
+            if (Hires) {
+                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, GameplayHudRenderer.GetMatrix());
             } else {
                 GameplayRenderer.Begin();
             }
-        }
-        private BlendState? prevBlendState;
-        private SamplerState? prevSamplerState;
-
-        protected override void StopSpriteBatch() {
-            prevBlendState = Draw.SpriteBatch.blendState;
-            prevSamplerState = Draw.SpriteBatch.samplerState;
-            base.StopSpriteBatch();
         }
 
         protected override void LoadState(Level newLevel) {

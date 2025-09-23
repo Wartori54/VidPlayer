@@ -50,7 +50,6 @@ public sealed class VidPlayerStyleground : Backdrop {
         cursor.EmitLdarg0();
         cursor.EmitLdcI4(1); // emit true
         cursor.EmitDelegate(RenderHiresVPS);
-        Console.WriteLine(il);
     }
 
     private static void RenderHiresVPS(Level level, bool fg) {
@@ -69,7 +68,7 @@ public sealed class VidPlayerStyleground : Backdrop {
             level.BackgroundColor = Color.Transparent;
 
             if (!sbBegin) {
-                Draw.SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, GetMatrix());
+                Draw.SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, GameplayHudRenderer.GetMatrix());
                 sbBegin = true;
             }
 
@@ -81,14 +80,7 @@ public sealed class VidPlayerStyleground : Backdrop {
             Draw.SpriteBatch.End();
     }
 
-    private static Matrix GetMatrix() {
-        Matrix matrix = Engine.ScreenMatrix;
-        if (SaveData.Instance.Assists.MirrorMode) {
-            matrix *= Matrix.CreateTranslation(-Engine.Viewport.Width, 0f, 0f);
-            matrix *= Matrix.CreateScale(-1f, 1f, 1f);
-        }
-        return matrix;
-    }
+    
 
     private void Load() {
         core?.Mark();
@@ -165,11 +157,11 @@ public sealed class VidPlayerStyleground : Backdrop {
         }
 
         protected override void RestartSpriteBatch() {
-            if (config.hires) {
-                Draw.SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, GetMatrix());
+            if (Hires) {
+                Draw.SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, GameplayHudRenderer.GetMatrix());
             } else {
                 // UseSpritebatch is set to false, and Render makes its own one
-                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, GetMatrix());
+                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, GameplayHudRenderer.GetMatrix());
             }
         }
 

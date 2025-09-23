@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Celeste.Mod.UI;
 using KeraLua;
 using Microsoft.Xna.Framework;
 using Monocle;
@@ -45,10 +46,29 @@ public class VidPlayerModule : EverestModule {
         // IL.Celeste.Level.Reload += ILLevelOnReload;
         On.Monocle.Engine.Update += EngineOnUpdate;
         
-        IL.Celeste.Level.Render += VidPlayerStyleground.ILLevelRender;
-    
+        IL.Celeste.Level.Render += ILLevelRenderPatches;
+        Everest.Events.LevelLoader.OnLoadingThread += AddGameplayHudToRendererList;
+        IL.Celeste.GameplayRenderer.Render += GameplayHudRenderer.ILGameplayRenderer;
     }
     
+    private static void ILLevelRenderPatches(ILContext il) {
+        VidPlayerStyleground.ILLevelRender(il);
+        GameplayHudRenderer.ILLevelRender(il);
+    }
+
+    private static void AddGameplayHudToRendererList(Level level) {
+        level.Add(GameplayHudRenderer.Instance);
+        level.RendererList.UpdateLists();
+        int shrIdx = level.RendererList.Renderers.FindIndex(r => r is SubHudRenderer);
+        level.RendererList.Renderers.Remove(GameplayHudRenderer.Instance);
+        level.RendererList.Renderers.Insert(shrIdx, GameplayHudRenderer.Instance);
+    }
+
+    public override void Initialize() {
+        base.Initialize();
+        GameplayHudRenderer.GameplayHud = new BitTag("gameplayHud");
+    }
+
     private static void EngineOnUpdate(On.Monocle.Engine.orig_Update orig, Engine self, GameTime dt) {
         orig(self, dt);
         VidPlayerManager.Collect();
@@ -60,7 +80,9 @@ public class VidPlayerModule : EverestModule {
         // On.Celeste.Level._GCCollect -= LevelOn_GCCollect;
         // IL.Celeste.Level.Reload -= ILLevelOnReload;
 
-        IL.Celeste.Level.Render -= VidPlayerStyleground.ILLevelRender;
+        IL.Celeste.Level.Render -= ILLevelRenderPatches;
+        Everest.Events.LevelLoader.OnLoadingThread -= AddGameplayHudToRendererList;
+        IL.Celeste.GameplayRenderer.Render += GameplayHudRenderer.ILGameplayRenderer;
     }
     
     private static void ILLevelOnReload(ILContext il) {
