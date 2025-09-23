@@ -16,10 +16,10 @@ public sealed class VidPlayerStyleground : Backdrop {
     
     private Scene? currentScene;
     private readonly BinaryPacker.Element data;
-    private static VirtualRenderTarget? tempFGRenderTarget;
 
     public VidPlayerStyleground(BinaryPacker.Element data) {
         this.data = data;
+        UseSpritebatch = false;
     }
 
     // hi-res stuff
@@ -55,7 +55,8 @@ public sealed class VidPlayerStyleground : Backdrop {
 
         // (right before SetRenderTarget(null))
         // Pre-render all FG hi-res stylegrounds into a separate RenderTarget
-        cursor.EmitDelegate<Action>(levelRender_prerenderFG);
+        // cursor.EmitDelegate<Action>(levelRender_prerenderFG);
+        cursor.Index--;
 
         if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdnull(),
                 instr => instr.MatchCallvirt<GraphicsDevice>("SetRenderTarget")) ||
@@ -73,25 +74,16 @@ public sealed class VidPlayerStyleground : Backdrop {
 
         // (Right after End())
         // Render contents of said separate RenderTarget
-        cursor.EmitDelegate<Action>(levelRender_renderFGRT);
-    }
-
-    private static void levelRender_prerenderFG() {
-        tempFGRenderTarget ??= VirtualContent.CreateRenderTarget(nameof(tempFGRenderTarget), Celeste.TargetWidth, Celeste.TargetHeight);
-        Engine.Instance.GraphicsDevice.SetRenderTarget(tempFGRenderTarget);
-        Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
-
-        renderHires(fg: true);
+        // cursor.EmitDelegate<Action>(levelRender_renderFGRT);
+        cursor.EmitDelegate<Action>(levelRender_renderFG);
     }
 
     private static void levelRender_renderBG() {
         renderHires(fg: false);
     }
-
-    private static void levelRender_renderFGRT() {
-        Draw.SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, getMatrix());
-        Draw.SpriteBatch.Draw((RenderTarget2D)tempFGRenderTarget, Vector2.Zero, Color.White);
-        Draw.SpriteBatch.End();
+    
+    private static void levelRender_renderFG() {
+        renderHires(fg: true);
     }
 
     private static void renderHires(bool fg) {
@@ -179,15 +171,15 @@ public sealed class VidPlayerStyleground : Backdrop {
 
     public override void Render(Scene scene) {
         if (!(core?.Hires ?? false)) {
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null);
             base.Render(scene);
             core?.Render();
+            Draw.SpriteBatch.End();
         }
     }
 
     public override void Ended(Scene scene) {
         base.Ended(scene);
-        tempFGRenderTarget?.Dispose();
-        tempFGRenderTarget = null;
         core?.Mark();
     }
 
@@ -206,8 +198,21 @@ public sealed class VidPlayerStyleground : Backdrop {
 
         protected override Vector2 GetEntitySize() {
             if (ExCamModImports.GetCameraDimensions == null || owner.currentScene == null)
-                return new Vector2(320, 160);
+                return new Vector2(320, 180);
             return ExCamModImports.GetCameraDimensions.Invoke((Level)owner.currentScene);
+        }
+
+        protected override void RestartSpriteBatch() {
+            if (config.hires) {
+                Draw.SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, getMatrix());
+            } else {
+                // UseSpritebatch is set to false, and Render makes its own one
+                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, getMatrix());
+            }
+        }
+
+        protected override void StopSpriteBatch() {
+            Draw.SpriteBatch.End();
         }
     }
 

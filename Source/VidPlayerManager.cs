@@ -47,8 +47,6 @@ public static class VidPlayerManager {
         public readonly VideoPlayer videoPlayer;
         public readonly Video video;
         public readonly ModAsset asset;
-        public VirtualRenderTarget? tempRenderTarget;
-        public SpriteBatch? tempSpriteBatch;
         public readonly string usedHandle;
         private bool marked;
         internal bool Marked => marked;
@@ -80,8 +78,6 @@ public static class VidPlayerManager {
         
         public void Dispose() {
             videoPlayer.Dispose();
-            tempRenderTarget?.Dispose();
-            tempSpriteBatch?.Dispose();
             GC.SuppressFinalize(this);
         }
 

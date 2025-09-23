@@ -63,7 +63,7 @@ public abstract class VidPlayerCore {
     private bool hasWoken = false;
     private VidPlayerManager.VidPlayerEntry? vidEntry;
     private readonly MTexture fallback;
-    private CoreConfig config;
+    protected CoreConfig config;
     private readonly bool loadingFailure;
 
     // For handyness
@@ -173,12 +173,9 @@ public abstract class VidPlayerCore {
         }
         
         
-        vidEntry!.tempRenderTarget ??= VirtualContent.CreateRenderTarget(nameof(vidEntry.tempRenderTarget), currTexture.Width, currTexture.Height);
-        vidEntry.tempSpriteBatch ??= new SpriteBatch(Engine.Graphics.GraphicsDevice);
-        RenderTargetBinding[]? origRTs = Engine.Graphics.GraphicsDevice.GetRenderTargets();
-        Engine.Instance.GraphicsDevice.SetRenderTarget(vidEntry.tempRenderTarget);
-        Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
-        ChromaKeyShader.Parameters["s0"].SetValue(currTexture);
+        // Steal the current transformMatrix to pass it to the effect, this is needed for its vertex shader
+        Matrix view = Draw.SpriteBatch.transformMatrix;
+        StopSpriteBatch();
         ChromaKeyShader.Parameters["key"].SetValue(new Vector4() {
             X = config.chromaKey.Value.R/255f,
             Y = config.chromaKey.Value.G/255f,
@@ -188,13 +185,16 @@ public abstract class VidPlayerCore {
         ChromaKeyShader.Parameters["base_thr"].SetValue(config.chromaBaseThr);
         ChromaKeyShader.Parameters["alpha_correction"].SetValue(config.chromaAlphaCorr);
         ChromaKeyShader.Parameters["spill"].SetValue(config.chromaSpill);
-        vidEntry.tempSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, ChromaKeyShader);
-        vidEntry.tempSpriteBatch.Draw(currTexture, Vector2.Zero, Color.White);
-        vidEntry.tempSpriteBatch.End(); // Technically useless but oh well
-        Engine.Graphics.GraphicsDevice.SetRenderTargets(origRTs);
-        
-        Draw.SpriteBatch.Draw(vidEntry.tempRenderTarget, dstRect, Color.White * config.globalAlpha);
-        
+
+        int width = Engine.Graphics.GraphicsDevice.Viewport.Width;
+        int height = Engine.Graphics.GraphicsDevice.Viewport.Height;
+        Matrix projection = Matrix.CreateOrthographicOffCenter(0, width, height, 0, 0, 1);
+
+        ChromaKeyShader.Parameters["view_projection"].SetValue(view * projection);
+        Draw.SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, ChromaKeyShader);
+        Draw.SpriteBatch.Draw(currTexture, dstRect, Color.White * config.globalAlpha);
+        Draw.SpriteBatch.End(); // Technically useless but oh well
+        RestartSpriteBatch();
     }
 
     public bool CanBeRevived() {
@@ -225,6 +225,11 @@ public abstract class VidPlayerCore {
 
     protected virtual Vector2 GetEntitySize() {
         return config.fixedEntitySize;
+    }
+
+    protected abstract void RestartSpriteBatch();
+    protected virtual void StopSpriteBatch() {
+        Draw.SpriteBatch.End();
     }
     
     protected virtual void SaveState(Level newLevel) {

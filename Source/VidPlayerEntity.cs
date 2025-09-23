@@ -3,7 +3,9 @@
 using System;
 using System.Collections;
 using Celeste.Mod.Entities;
+using Celeste.Mod.UI;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 
 namespace Celeste.Mod.VidPlayer;
@@ -130,6 +132,22 @@ public sealed class VidPlayerEntity : Entity {
         protected override Vector2 Position => Hires ? owner.Position - owner.SceneAs<Level>().Camera.Position : owner.Position;
 
         protected override Level? CurrentLevel => owner.SceneAs<Level>();
+
+        protected override void RestartSpriteBatch() {
+            if (config.hires) {
+                SubHudRenderer.BeginRender(prevBlendState, prevSamplerState);
+            } else {
+                GameplayRenderer.Begin();
+            }
+        }
+        private BlendState? prevBlendState;
+        private SamplerState? prevSamplerState;
+
+        protected override void StopSpriteBatch() {
+            prevBlendState = Draw.SpriteBatch.blendState;
+            prevSamplerState = Draw.SpriteBatch.samplerState;
+            base.StopSpriteBatch();
+        }
 
         protected override void LoadState(Level newLevel) {
             base.LoadState(newLevel);

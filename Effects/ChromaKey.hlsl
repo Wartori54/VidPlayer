@@ -1,7 +1,4 @@
-texture s0;
-sampler s0sampler = sampler_state {
-    Texture = s0;
-};
+sampler s0sampler;
 
 // This shader is mostly based on https://github.com/obsproject/obs-studio/blob/master/plugins/obs-filters/data/chroma_key_filter_v2.effect
 // from the obs project
@@ -30,8 +27,30 @@ float key_dist(float3 pix) {
     return sqrt((pix.y - key_tr.y) * (pix.y - key_tr.y) + (pix.z - key_tr.z) * (pix.z - key_tr.z));
 }
 
-float4 pixel_shader(float2 tex : TEXCOORD0) : SV_Target0 {
-    float4 rgba = tex2D(s0sampler, tex);
+struct VertexInput {
+    float4 Position : POSITION0;
+    float4 Color : COLOR0;
+    float4 TexCoord : TEXCOORD0;
+};
+struct PixelInput {
+    float4 Position : SV_Position0;
+    float4 Color : COLOR0;
+    float4 TexCoord : TEXCOORD0;
+};
+float4x4 view_projection;
+
+
+PixelInput vertex_shader(VertexInput v) {
+    PixelInput output;
+
+    output.Position = mul(v.Position, view_projection);
+    output.Color = v.Color;
+    output.TexCoord = v.TexCoord;
+    return output;
+}
+
+float4 pixel_shader(PixelInput p) : COLOR0 {
+    float4 rgba = tex2D(s0sampler, p.TexCoord.xy);
     float3 ycbcr = rgb2ycbcr(rgba.rgb);
     float d = key_dist(ycbcr);
     float base_mask = d - base_thr;
@@ -43,13 +62,14 @@ float4 pixel_shader(float2 tex : TEXCOORD0) : SV_Target0 {
     rgba.rgb = lerp(float3(desat, desat, desat), rgba.rgb, spill_val);
 
     rgba.rgb *= rgba.a; // Make sure to premultiply
-    return rgba;
+    return rgba * p.Color;
 }
 
 technique Main
 {
     pass
     {
+        VertexShader = compile vs_2_0 vertex_shader();
         PixelShader = compile ps_2_0 pixel_shader();
     }
 }
