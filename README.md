@@ -19,7 +19,7 @@ Simply pass your video file to the "In-Game Video Player" entity.
 ### With LuaCutscenes
 It is also possible to play videos programatically through LuaCutscenes:
 ```lua
-local vidPlayer = require("#Celeste.Mod.VidPlayerEntityLua")
+local vidPlayer = require("#Celeste.Mod.VidPlayer.VidPlayerEntityLua")
 local v
 function onBegin()
     v = vidPlayer.SpawnLoop("TestMod:/Graphics/Videos/myvideo.ogv", 10, 10, 100, 100)
