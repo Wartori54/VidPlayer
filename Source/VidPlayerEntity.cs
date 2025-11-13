@@ -49,9 +49,9 @@ public sealed class VidPlayerEntity : Entity {
             data.Float("chromaKeyBaseThr"),
             data.Float("chromaKeyAlphaCorr"),
             data.Float("chromaKeySpill"),
+            data.Int("depth", Depths.Top),
             offset) {
     }
-
     public VidPlayerEntity(Vector2 position,
         Vector2 entitySize,
         string videoTarget,
@@ -66,6 +66,25 @@ public sealed class VidPlayerEntity : Entity {
         float entityChromaKeyBaseThr,
         float entityChromaKeyAlphaCorr,
         float entityChromaKeySpill,
+        Vector2 offset) : this(position, entitySize, videoTarget, entityIsMuted, entityKeepAspectRatio, entityLooping, entityHires, entityVolumeMult, entityGlobalAlpha, entityCentered, entityChromaKey, entityChromaKeyBaseThr, entityChromaKeyAlphaCorr, entityChromaKeySpill, Depths.Top, offset) {
+        
+    }
+
+    private VidPlayerEntity(Vector2 position,
+        Vector2 entitySize,
+        string videoTarget,
+        bool entityIsMuted,
+        bool entityKeepAspectRatio,
+        bool entityLooping,
+        bool entityHires,
+        float entityVolumeMult,
+        float entityGlobalAlpha,
+        bool entityCentered,
+        Color? entityChromaKey,
+        float entityChromaKeyBaseThr,
+        float entityChromaKeyAlphaCorr,
+        float entityChromaKeySpill,
+        int depth,
         Vector2 offset) : base(position + offset) {
         VidPlayerCore.CoreConfig config = new(entitySize,
             entityIsMuted,
@@ -81,7 +100,7 @@ public sealed class VidPlayerEntity : Entity {
             entityChromaKeySpill);
         core = new VidPlayerCoreEntity(this, videoTarget, config);
         Tag = Tags.PauseUpdate | Tags.TransitionUpdate;
-        Depth = Depths.Top;
+        Depth = depth;
 
         // Switch to this once it hits main
         // if (SRTModImports.IgnoreSaveState is { } cb) {
@@ -92,6 +111,7 @@ public sealed class VidPlayerEntity : Entity {
         Collider = new Hitbox(entitySize.X, entitySize.Y);
 #endif
         if (core.Hires) {
+            Depth = Depths.Top; // Always default to Top on hires, depths are not supported anyway
             Tag |= GameplayHudRenderer.GameplayHud;
         }
     }

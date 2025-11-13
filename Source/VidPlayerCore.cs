@@ -44,7 +44,7 @@ public abstract class VidPlayerCore {
         public readonly float chromaAlphaCorr;
         public readonly float chromaSpill;
         
-        public CoreConfig(Vector2 fixedEntitySize, bool muted, bool keepAspectRatio, bool looping, bool hires, float volumeMult, float globalAlpha, bool centered, Color? chromaKey, float chromaBaseThr, float chromaAlphaCorr, float chromaSpill) {
+        internal CoreConfig(Vector2 fixedEntitySize, bool muted, bool keepAspectRatio, bool looping, bool hires, float volumeMult, float globalAlpha, bool centered, Color? chromaKey, float chromaBaseThr, float chromaAlphaCorr, float chromaSpill) {
             this.fixedEntitySize = fixedEntitySize;
             this.muted = muted;
             this.keepAspectRatio = keepAspectRatio;

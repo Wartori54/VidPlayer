@@ -16,6 +16,8 @@ entities.VidPlayer/VidPlayerEntity.attributes.name.chromaKeyAlphaCorr=Chroma Key
 entities.VidPlayer/VidPlayerEntity.attributes.description.chromaKeyAlphaCorr=Alpha correction threshold, pixels below this threshold (starting from the Base threshold) will become proportionally transparent.
 entities.VidPlayer/VidPlayerEntity.attributes.name.chromaKeySpill=Chroma Key Spill
 entities.VidPlayer/VidPlayerEntity.attributes.description.chromaKeySpill=Color desaturation threshold, pixels below this threshold (starting from the Base threshold) will be proportionally desaturated.
+entities.VidPlayer/VidPlayerEntity.attributes.name.depth=Custom Depth
+entities.VidPlayer/VidPlayerEntity.attributes.description.depth=Only available with Hires disabled, defaults to Depths.Top.
 
 triggers.VidPlayer/VidPlayerStylegroundReset.placements.name.vidPlayerStylegroundReset=In-Game Video Styleground Reset
 triggers.VidPlayer/VidPlayerStylegroundReset.attributes.description.tag=Stylegrounds with this tag will be reset.

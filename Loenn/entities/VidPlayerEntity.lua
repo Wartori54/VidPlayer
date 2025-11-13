@@ -24,6 +24,7 @@ vidPlayerEntity.placements = {
         chromaKeyBaseThr = 0.1,
         chromaKeyAlphaCorr = 0.1,
         chromaKeySpill = 0.1,
+        depth = -1000000,
     }
 }
 vidPlayerEntity.fieldInformation = {
@@ -51,6 +52,9 @@ vidPlayerEntity.fieldInformation = {
         fieldType = "number",
         minimumValue = 0.000001, -- epsilon
     },
+    depth = {
+        fieldType = "integer",
+    }
 }
 
 function vidPlayerEntity.sprite(room, entity)
