@@ -43,8 +43,9 @@ public abstract class VidPlayerCore {
         public readonly float chromaBaseThr;
         public readonly float chromaAlphaCorr;
         public readonly float chromaSpill;
+        public readonly bool unPausable;
         
-        internal CoreConfig(Vector2 fixedEntitySize, bool muted, bool keepAspectRatio, bool looping, bool hires, float volumeMult, float globalAlpha, bool centered, Color? chromaKey, float chromaBaseThr, float chromaAlphaCorr, float chromaSpill) {
+        internal CoreConfig(Vector2 fixedEntitySize, bool muted, bool keepAspectRatio, bool looping, bool hires, float volumeMult, float globalAlpha, bool centered, Color? chromaKey, float chromaBaseThr, float chromaAlphaCorr, float chromaSpill, bool unPausable) {
             this.fixedEntitySize = fixedEntitySize;
             this.muted = muted;
             this.keepAspectRatio = keepAspectRatio;
@@ -57,6 +58,7 @@ public abstract class VidPlayerCore {
             this.chromaBaseThr = chromaBaseThr;
             this.chromaAlphaCorr = chromaAlphaCorr;
             this.chromaSpill = chromaSpill;
+            this.unPausable = unPausable;
         }
     }
     
@@ -130,7 +132,7 @@ public abstract class VidPlayerCore {
         // ReSharper disable once CompareOfFloatsByEqualityOperator
         if (normVolume != videoPlayer!.Volume)
             videoPlayer.Volume = normVolume;
-        if (Paused) {
+        if (Paused && !config.unPausable) {
             videoPlayer.Pause();
         } else {
             videoPlayer.Resume();

@@ -99,7 +99,8 @@ public sealed class VidPlayerStyleground : Backdrop {
             chromaKey,
             data.AttrFloat("chromaKeyBaseThr"), 
             data.AttrFloat("chromaKeyAlphaCorr"),
-            data.AttrFloat("chromaKeySpill"));
+            data.AttrFloat("chromaKeySpill"),
+            data.AttrBool("unpausable"));
         core = new VidPlayerStylegroundCore(this,
             data.Attr("video"),
             config);

@@ -25,6 +25,7 @@ vidPlayerEntity.placements = {
         chromaKeyAlphaCorr = 0.1,
         chromaKeySpill = 0.1,
         depth = -1000000,
+        unpausable = false,
     }
 }
 vidPlayerEntity.fieldInformation = {

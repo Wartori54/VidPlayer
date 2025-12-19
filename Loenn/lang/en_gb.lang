@@ -18,6 +18,8 @@ entities.VidPlayer/VidPlayerEntity.attributes.name.chromaKeySpill=Chroma Key Spi
 entities.VidPlayer/VidPlayerEntity.attributes.description.chromaKeySpill=Color desaturation threshold, pixels below this threshold (starting from the Base threshold) will be proportionally desaturated.
 entities.VidPlayer/VidPlayerEntity.attributes.name.depth=Custom Depth
 entities.VidPlayer/VidPlayerEntity.attributes.description.depth=Only available with Hires disabled, defaults to Depths.Top.
+entities.VidPlayer/VidPlayerEntity.attributes.name.unpausable=Don't pause on pause
+entities.VidPlayer/VidPlayerEntity.attributes.description.unpausable=Do not stop playback during the pause menu.
 
 triggers.VidPlayer/VidPlayerStylegroundReset.placements.name.vidPlayerStylegroundReset=In-Game Video Styleground Reset
 triggers.VidPlayer/VidPlayerStylegroundReset.attributes.description.tag=Stylegrounds with this tag will be reset.
@@ -36,4 +38,6 @@ style.effects.VidPlayer/VidPlayerStyleground.attribute.chromaKeyAlphaCorr=Chroma
 style.effects.VidPlayer/VidPlayerStyleground.description.chromaKeyAlphaCorr=Alpha correction threshold, pixels below this threshold (starting from the Base threshold) will become proportionally transparent.
 style.effects.VidPlayer/VidPlayerStyleground.attribute.chromaKeySpill=Chroma Key Spill
 style.effects.VidPlayer/VidPlayerStyleground.description.chromaKeySpill=Color desaturation threshold, pixels below this threshold (starting from the Base threshold) will be proportionally desaturated.
+style.effects.VidPlayer/VidPlayerStyleground.attribute.unpausable=Don't pause on pause
+style.effects.VidPlayer/VidPlayerStyleground.description.unpausable=Do not stop playback during the pause menu.
 

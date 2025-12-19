@@ -16,6 +16,7 @@ vidPlayerStyleground.defaultData = {
     chromaKeyBaseThr = 0,
     chromaKeyAlphaCorr = 0.1,
     chromaKeySpill = 0.1,
+    unpausable = false,
 }
 
 vidPlayerStyleground.fieldInformation = {

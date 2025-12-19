@@ -50,6 +50,7 @@ public sealed class VidPlayerEntity : Entity {
             data.Float("chromaKeyAlphaCorr"),
             data.Float("chromaKeySpill"),
             data.Int("depth", Depths.Top),
+            data.Bool("unpausable"),
             offset) {
     }
     public VidPlayerEntity(Vector2 position,
@@ -66,7 +67,7 @@ public sealed class VidPlayerEntity : Entity {
         float entityChromaKeyBaseThr,
         float entityChromaKeyAlphaCorr,
         float entityChromaKeySpill,
-        Vector2 offset) : this(position, entitySize, videoTarget, entityIsMuted, entityKeepAspectRatio, entityLooping, entityHires, entityVolumeMult, entityGlobalAlpha, entityCentered, entityChromaKey, entityChromaKeyBaseThr, entityChromaKeyAlphaCorr, entityChromaKeySpill, Depths.Top, offset) {
+        Vector2 offset) : this(position, entitySize, videoTarget, entityIsMuted, entityKeepAspectRatio, entityLooping, entityHires, entityVolumeMult, entityGlobalAlpha, entityCentered, entityChromaKey, entityChromaKeyBaseThr, entityChromaKeyAlphaCorr, entityChromaKeySpill, Depths.Top, false, offset) {
         
     }
 
@@ -85,6 +86,7 @@ public sealed class VidPlayerEntity : Entity {
         float entityChromaKeyAlphaCorr,
         float entityChromaKeySpill,
         int depth,
+        bool unPausable,
         Vector2 offset) : base(position + offset) {
         VidPlayerCore.CoreConfig config = new(entitySize,
             entityIsMuted,
@@ -97,7 +99,8 @@ public sealed class VidPlayerEntity : Entity {
             entityChromaKey,
             entityChromaKeyBaseThr,
             entityChromaKeyAlphaCorr,
-            entityChromaKeySpill);
+            entityChromaKeySpill,
+            unPausable);
         core = new VidPlayerCoreEntity(this, videoTarget, config);
         Tag = Tags.PauseUpdate | Tags.TransitionUpdate;
         Depth = depth;
