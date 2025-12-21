@@ -82,7 +82,7 @@ public class VidPlayerModule : EverestModule {
 
         IL.Celeste.Level.Render -= ILLevelRenderPatches;
         Everest.Events.LevelLoader.OnLoadingThread -= AddGameplayHudToRendererList;
-        IL.Celeste.GameplayRenderer.Render += GameplayHudRenderer.ILGameplayRenderer;
+        IL.Celeste.GameplayRenderer.Render -= GameplayHudRenderer.ILGameplayRenderer;
     }
     
     private static void ILLevelOnReload(ILContext il) {
