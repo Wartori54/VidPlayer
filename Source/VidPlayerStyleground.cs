@@ -146,7 +146,8 @@ public sealed class VidPlayerStyleground : Backdrop {
             this.owner = owner;
         }
 
-        protected override bool Paused => (owner.currentScene?.Paused ?? true) || !owner.Visible;
+        protected override bool Paused => owner.currentScene?.Paused ?? true;
+        protected override bool ForcePaused => !owner.Visible || owner.currentScene == null;
         protected override Vector2 Position => Vector2.Zero;
 
         protected override Level? CurrentLevel => owner.currentScene as Level;

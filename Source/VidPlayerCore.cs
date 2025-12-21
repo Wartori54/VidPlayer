@@ -90,6 +90,7 @@ public abstract class VidPlayerCore {
     }
     
     protected abstract bool Paused { get; }
+    protected abstract bool ForcePaused { get; }
     
     protected abstract Vector2 Position { get; }
     
@@ -132,7 +133,7 @@ public abstract class VidPlayerCore {
         // ReSharper disable once CompareOfFloatsByEqualityOperator
         if (normVolume != videoPlayer!.Volume)
             videoPlayer.Volume = normVolume;
-        if (Paused && !config.unPausable) {
+        if (ForcePaused || (Paused && !config.unPausable)) {
             videoPlayer.Pause();
         } else {
             videoPlayer.Resume();
