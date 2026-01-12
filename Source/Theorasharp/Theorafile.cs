@@ -218,17 +218,20 @@ public static class TheorafileBun
 	public static extern int tf_readvideo(IntPtr file, IntPtr buffer, int numframes);
 
 	[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-	public static extern int tf_readvideo2(IntPtr file, IntPtr buffer, int numframes, out long granpos);
+	public static extern unsafe int tf_readvideo2(IntPtr file, IntPtr buffer, int numframes, long *granpos);
 
 	[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-	public static extern void tf_granpos_dec(IntPtr file, long granpos, out double sec, out long frame);
+	public static extern unsafe void tf_granpos_dec(IntPtr file, long granpos, double *sec, long *frame);
 	
 
 	[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
 	public static extern int tf_readaudio(IntPtr file, IntPtr buffer, int length);
 	
 	[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-	public static extern int tf_readaudio2(IntPtr file, IntPtr buffer, int length, out long granpos);
+	public static extern unsafe int tf_readaudio2(IntPtr file, IntPtr buffer, int length, long *granpos);
+
+	[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+	public static extern UIntPtr tf_gettheorasize();
 
 	#endregion
 
@@ -247,36 +250,8 @@ public static class TheorafileBun
 	 * -flibit
 	 */
 
-	private static IntPtr AllocTheoraFile()
-	{
-		// Do not attempt to understand these numbers at all costs!
-		const int size32 = 1160;
-		const int size64Unix = 1472;
-		const int size64Windows = 1328;
-
-		PlatformID platform = Environment.OSVersion.Platform;
-		if (IntPtr.Size == 4)
-		{
-			/* Technically this could be a little bit smaller, but
-			 * some 32-bit architectures may be higher even on Unix
-			 * targets (like ARMv7).
-			 * -flibit
-			 */
-			return Marshal.AllocHGlobal(size32);
-		}
-		if (IntPtr.Size == 8)
-		{
-			if (platform == PlatformID.Unix)
-			{
-				return Marshal.AllocHGlobal(size64Unix);
-			}
-			else if (platform == PlatformID.Win32NT)
-			{
-				return Marshal.AllocHGlobal(size64Windows);
-			}
-			throw new NotSupportedException("Unhandled platform!");
-		}
-		throw new NotSupportedException("Unhandled architecture!");
+	private static unsafe IntPtr AllocTheoraFile() {
+		return (IntPtr)NativeMemory.AlignedAlloc(tf_gettheorasize(), 8);
 	}
 
 	#endregion

@@ -418,7 +418,7 @@ namespace Celeste.Mod.VidPlayer.FNA_Reimpl
 		private static readonly float[] audioData = new float[AUDIO_BUFFER_SIZE];
 		private static GCHandle audioHandle = GCHandle.Alloc(audioData, GCHandleType.Pinned);
 		private IntPtr audioDataPtr = audioHandle.AddrOfPinnedObject();
-		private long currentGPos = 0;
+		private double secGPos = -1;
 
 		#endregion
 
@@ -536,26 +536,35 @@ namespace Celeste.Mod.VidPlayer.FNA_Reimpl
 			}
 
 			if (Patch) {
-				TheorafileTarget.tf_granpos_dec(theora, currentGPos, out double sec, out _);
-				
+
 				// Make sure we are past the next frame time
-				if (sec * 1000 <= timer.ElapsedMilliseconds) {
+				if (secGPos * 1000 <= timer.ElapsedMilliseconds) {
 					// Only update the textures if we need to!
 					int rets = 0;
 					// Read as much as possible to keep up
 					// Note: do not use the current time since this can become really unstable
 					// if reading takes too long
 					long startMilis = timer.ElapsedMilliseconds;
-					while (sec * 1000 <= startMilis && TheorafileTarget.tf_eos(theora) != 1) {
-						rets += TheorafileTarget.tf_readvideo2(
-							theora,
-							yuvData,
-							1,
-							out currentGPos
-						);
-						TheorafileTarget.tf_granpos_dec(theora, currentGPos, out sec, out _);
+					long cgp = 0;
+					while (secGPos * 1000 <= startMilis && TheorafileTarget.tf_eos(theora) != 1) {
+						double sgp = 0;
+						int r;
+						unsafe {
+							r = TheorafileTarget.tf_readvideo2(
+								theora,
+								yuvData,
+								1,
+								&cgp
+							);
+							TheorafileTarget.tf_granpos_dec(theora, cgp, &sgp, null);
+						}
+						secGPos = sgp;
+						if (r == 0) { // Something went wrong, bail out
+							break;
+						}
+						rets += r;
 					}
-					if (rets > 0 || currentGPos < 0) {
+					if (rets > 0 || cgp < 0) {
 						UpdateTexture();
 					}
 				}
@@ -874,7 +883,6 @@ namespace Celeste.Mod.VidPlayer.FNA_Reimpl
 			}
 
 			currentFrame = -1;
-			currentGPos = -1;
 		}
 
 		#endregion
