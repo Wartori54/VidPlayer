@@ -93,7 +93,7 @@ public abstract class VidPlayerCore {
     protected abstract bool Paused { get; }
     protected abstract bool ForcePaused { get; }
     
-    protected abstract Vector2 Position { get; }
+    public abstract Vector2 Position { get; }
     
     protected abstract Level? CurrentLevel { get; }
 

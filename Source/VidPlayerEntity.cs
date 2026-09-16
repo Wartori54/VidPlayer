@@ -144,7 +144,7 @@ public sealed class VidPlayerEntity : Entity {
         core.Mark();
     }
 
-    private class VidPlayerCoreEntity : VidPlayerCore {
+    public class VidPlayerCoreEntity : VidPlayerCore {
         private readonly VidPlayerEntity owner;
 
         public VidPlayerCoreEntity(VidPlayerEntity owner, string videoTarget, CoreConfig config) 
@@ -154,7 +154,7 @@ public sealed class VidPlayerEntity : Entity {
 
         protected override bool Paused => owner.Scene.Paused || owner.SceneAs<Level>().Transitioning;
         protected override bool ForcePaused => owner.ForcePause;
-        protected override Vector2 Position => Hires ? owner.Position - owner.SceneAs<Level>().Camera.Position : owner.Position;
+        public override Vector2 Position => Hires ? owner.Position - owner.SceneAs<Level>().Camera.Position : owner.Position;
 
         protected override Level? CurrentLevel => owner.SceneAs<Level>();
 

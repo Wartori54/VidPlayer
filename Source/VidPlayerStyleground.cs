@@ -80,7 +80,7 @@ public sealed class VidPlayerStyleground : Backdrop, IVidPlayerStyleground {
         core?.Mark();
     }
 
-    private class VidPlayerStylegroundCore : VidPlayerCore {
+    public class VidPlayerStylegroundCore : VidPlayerCore {
         private readonly VidPlayerStyleground owner;
         
         public VidPlayerStylegroundCore(VidPlayerStyleground owner, string videoTarget, CoreConfig config) 
@@ -90,7 +90,7 @@ public sealed class VidPlayerStyleground : Backdrop, IVidPlayerStyleground {
 
         protected override bool Paused => owner.currentScene?.Paused ?? true;
         protected override bool ForcePaused => !owner.Visible || owner.currentScene == null;
-        protected override Vector2 Position => Vector2.Zero;
+        public override Vector2 Position => Vector2.Zero;
 
         protected override Level? CurrentLevel => owner.currentScene as Level;
 
